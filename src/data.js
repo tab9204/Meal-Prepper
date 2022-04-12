@@ -6,7 +6,8 @@ import "../libraries/pouchdb-7.2.1.js";
 var navigate = {
   //navigates to the meal edit view
   //id => the id of the meal to display for editing
-  toMealEdit: async (id)=>{
+  //navIn => animation class to add the view to the screen
+  toMealEdit: async (id,navIn)=>{
     //the meal data the edit view needs to render
     var meal_id, name, ingredients, directions;
     //if the id is not undefined we are editing an existing meal
@@ -35,7 +36,7 @@ var navigate = {
       directions = '';
     }
     //route to the edit view passing the rendering vars
-    m.route.set('/edit', {meal:{id:meal_id, name:name, ingredients:ingredients, directions:directions}});
+    m.route.set('/edit', {meal:{id:meal_id, name:name, ingredients:ingredients, directions:directions}, navIn: navIn});
   },
   //navigates to the meal list view
   toMealList: async ()=>{
@@ -47,7 +48,8 @@ var navigate = {
     m.route.set('/list', {meals: allMeals});
   },
   //navigates to the meal plan view
-  toMealPlan: async ()=>{
+  //navIn => animation class to add the view to the screen
+  toMealPlan: async (navIn)=>{
     //array of objects needed to render the meal plan view
     //each object is a meal consisting of:
       //the name of the meal, the meal id, the id of the day in the meal plan db, and a checked boolean
@@ -71,14 +73,15 @@ var navigate = {
       renderData = [""];
     }
     //route to the mealPlan view passing the render data to the view
-    m.route.set('/plan',{plan: renderData});
+    m.route.set('/plan',{plan: renderData, navIn: navIn});
   },
-  toShoppingList: async ()=>{
+  //navIn => animation class to add the view to the screen
+  toShoppingList: async (navIn)=>{
     //create the shopping list
     var shoppingList = await views.shoppingList.createList();
     if(shoppingList == undefined || shoppingList.length == 0){shoppingList = [""];}
     //route to the shopping list view
-    m.route.set('/shop',{list: shoppingList});
+    m.route.set('/shop',{list: shoppingList, navIn: navIn});
   }
 }
 
@@ -97,6 +100,8 @@ var views = {
           click: async (vnode)=>{
             await database.delete(database.meals,vnode.attrs.meal.id);
             navigate.toMealList();
+            //animate the view out
+            vnode.dom.classList.add("navOutRight");
           },
           text: "Delete"
         },
@@ -108,10 +113,10 @@ var views = {
         }
       ]
     },
-    //on key up event
+    //on input change
     //e => event data
     //id => id of the meal being edited
-    keyUp: (e,id)=>{
+    onChange: (e,id)=>{
       //prevent mithril from redrawing the view
       //if we did not do this the text in the textarea would be removed
       e.redraw = false;
@@ -223,7 +228,8 @@ var views = {
       //if we have added enough meals for each day in the meal plan
       else if(added == days){
         //navigate to the meal plan view. This will re-render the view with the most up to date meal plan
-        navigate.toMealPlan();
+        m.redraw();
+      //  navigate.toMealPlan();
       }
     },
     //deletes the current meal plan from the db
@@ -232,6 +238,18 @@ var views = {
       var allDays = await database.getAll(database.mealPlan);
       //loop through all meals and delete them from the meal plan db
       for(var i = 0; i < allDays.length; i++){
+        //since we are going to create a new meal plan we want to reset the checked array on each meal in the meal plan
+        //get the meal data
+        var meal = await database.get(database.meals,allDays[i].doc.meal_id);
+        //update the checked array only if the meal still exists in the recipe
+        if(meal !== ""){
+          //reset the checked array
+          meal.checked = undefined;
+          //update the meal entry with the new checked array
+          var update = {name: meal.name, ingredients:meal.ingredients, directions:meal.directions, checked: meal.checked};
+          await database.update(database.meals,meal._id,update);
+        }
+        //now we can delete the meal from the meal plan
         await database.delete(database.mealPlan,allDays[i].id + "");
       }
     },
@@ -275,10 +293,9 @@ var views = {
         var meal = await database.get(database.meals,day.doc.meal_id);
         //if the meal no longer exists in the db skip it
         if(meal == ""){continue ;}
-        //if the meals checked array is undefined that means the array should be empty
-        //for some reason indexeddb does not like storing empty arrays
-        //so it returns undefined instead of the empty array that was put there
-        var checked = meal.checked == undefined ? [""] : meal.checked;
+        //if the meals checked array is undefined or empty we need to set the array to have an empty string
+        //we cannot pass an empty array to the view so we need to pass the array with something in it or else we get an error
+        var checked = meal.checked == undefined || meal.checked.length == 0 ? [""] : meal.checked;
         //convert the ingredients string into an array
         //filter out any blank strings as we want to ignore those
         var strToArry = meal.ingredients.split("\n").filter(ingredient => ingredient);
@@ -342,7 +359,7 @@ const utilities ={
     open: (id)=>{
       try {
         //only open the lightbox if one is not already open
-        if(!document.getElementsByClassName("lightBox open").length >= 1){
+        if(!document.getElementsByClassName("lightBoxContainer open").length >= 1){
           var lightBox = document.getElementById(id);
           lightBox.classList.remove("closed");
           lightBox.classList.add("open");
@@ -359,6 +376,19 @@ const utilities ={
       }
       catch(e){console.log("No lightbox on this view");}
     }
+  },
+  //resolves a promise after an animation has ended
+  //used to delay removing a view until after that view's animation has ended
+  animationDelay: (vnode) =>{
+    //defer removing the view until after the nav out animation finishes
+    return new Promise((resolve)=> {
+        vnode.dom.addEventListener("animationend", resolve);
+    })
+  },
+  //resolves a promise after a set amount of time
+  timedDelay: ()=>{
+    //wait 300 ms to allow time for the nav animation to finish
+    return new Promise((resolve) => {setTimeout(() => {resolve()}, 300)});
   }
 }
 

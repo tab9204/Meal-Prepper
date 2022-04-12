@@ -9,14 +9,17 @@
   //vnode data of the view where the lightBox is being used
 var lightBox = {
   view: (vnode)=>{
-    return m('.lightBox.closed',{id: vnode.attrs.id} ,[
-      m(".lightBoxText",vnode.attrs.text),
-      m(".lightBoxButtons",[
-        vnode.attrs.buttons.map((button)=>{
-          return m(".lightBoxBtn",{onclick: ()=>{
-            button.click(vnode.attrs.vnode);
-          }}, button.text)
-        })
+    return m(".lightBoxContainer.closed",{id: vnode.attrs.id},[
+      m(".lightBoxBackground",""),
+      m('.lightBox',[
+        m(".lightBoxText",vnode.attrs.text),
+        m(".lightBoxButtons",[
+          vnode.attrs.buttons.map((button)=>{
+            return m(".lightBoxBtn",{onclick: ()=>{
+              button.click(vnode.attrs.vnode);
+            }}, button.text)
+          })
+        ])
       ])
     ])
   }

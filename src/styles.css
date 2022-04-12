@@ -1,49 +1,56 @@
 /*General styles*/
 html{min-height: 100vh; width: 100%;}
-body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: contain; overflow: hidden;}
+body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: contain; overflow: hidden; background: #E8EAEE;}
 .hidden{display:none !important;}
 .disabled{pointer-events: none !important;}
 ::-webkit-scrollbar {width: 0px;}
 .navBtn{width: 50px; height: 50px;}
 .header{display: flex; background: #4281A4;}
 
-#appRoot{height: 100%; position: relative;}
-  #pageContainer{height: 100%; display: flex; flex-direction: column;}
+#appRoot{position: relative; height: 100%;}
+  #pageContainer{height: 100%; display: flex; flex-direction: column; background: white; width: 100%;}
     #pageContent{padding: 8px; overflow-y: scroll; max-width: 640px; position: relative; left: 50%; transform: translateX(-50%);}
 
-.lightBox{position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: #4281A4; border: 1px solid black; width: 80%; max-width: 640px; padding: 10px; z-index: 2;}
-.lightBox.closed{display: none !important;}
-.lightBox.open{display: block !important;}
-  .lightBox .lightboxText{margin-bottom: 10px;}
-  .lightBoxButtons{display: flex; justify-content: space-around;}
-    .lightboxBtn{padding: 5px; background: #B2FFA9; border:1px solid; border-radius: 5px;}
+.lightBoxContainer.closed{display: none !important;}
+.lightBoxContainer.open{display: block !important;}
+  .lightBoxBackground{position: absolute; background: black; z-index: 3; opacity: .6; width: 100%; height: 100%;}
+  .lightBox{position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: #4281A4; border: 1px solid black; width: 80%; max-width: 640px; padding: 10px; z-index: 4;}
+    .lightBox .lightboxText{margin-bottom: 10px;}
+    .lightBoxButtons{display: flex; justify-content: space-around;}
+      .lightboxBtn{padding: 5px; background: #B2FFA9; border:1px solid; border-radius: 5px;}
 
 
 /**view styles***/
-mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
-mealEdit #mealEditHeader{justify-content: space-between;}
-mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
-mealEdit .pageSection:first-child{height: 35px !important;}
-mealEdit .pageSection {height: 50%; margin: 5px;}
-mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none;}
-mealEdit textarea:focus{outline: none;}
-
-
+mealList{z-index: 1; position: absolute;}
 mealList #mealListHeader{ justify-content: space-between;}
 mealList #toMealEdit {transform: rotate(180deg);}
 mealList #mealList{display: flex; flex-wrap: wrap; justify-content: space-between;}
 mealList .mealListItem{border: 1px solid; border-radius: 3px; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; width: 45%; background:#B2FFA9;}
 mealList #explainationText div{margin: 5px 0 20px 0; font-size: 1.5em; padding:5px;}
 
+
+mealEdit{z-index: 2; position: fixed;}
+mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
+mealEdit #mealEditHeader{justify-content: space-between;}
+mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
+mealEdit .pageSection:first-child{height: 35px !important;}
+mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 50%; border-top: 1px solid;}
+mealEdit .pageSection {margin: 5px;}
+mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none;}
+mealEdit textarea:focus{outline: none;}
+
+
+mealPlan{z-index: 2; position: fixed;}
 mealPlan #mealPlanHeader{justify-content: space-between;}
 mealPlan #toMealList {transform: rotate(180deg);}
-mealPlan #toShoppingList{position: fixed; bottom: 5px; left: 5px; border-radius: 30px; border: 1px solid; z-index: 2;}
-mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 18px 0px; font-size: 1.3em; left: 50%; transform: translateX(-50%); background:#B2FFA9;}
+mealPlan #toShoppingList{position: absolute; bottom: 5px; left: 5px; border-radius: 30px; border: 1px solid; z-index: 2;}
+mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 18px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#B2FFA9;}
 mealPlan .mealDay.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important;}
 mealPlan .mealCheck{width: 28px; position: absolute; left: -12px; top: -12px; border: 1px solid; border-radius: 20px; background: white;}
-mealPlan .mealNumber{border-right: 1px solid; margin-left: 10px; padding: 0 10px 0 10px;}
+mealPlan .mealNumber{border-right: 1px solid; padding: 0 10px 0 10px;}
 mealPlan .mealName{margin-left: 20px;}
 
+shoppingList{z-index: 3; position: fixed;}
 shoppingList #shoppingListHeader{justify-content: end;}
 shoppingList #toMealPlan {transform: rotate(180deg);}
 shoppingList .shoppingListMeal{margin: 10px; padding: 5px;}
@@ -53,7 +60,33 @@ shoppingList .mealRepeat{margin: 5px 0;}
 shoppingList .mealIngredient{font-size: 1.2em; margin: 2px 0; padding: 2px 0;}
 shoppingList .mealIngredient.checked{text-decoration: line-through;}
 
+/*Animations*/
+.navInLeft{animation: navInLeft 0.2s; animation-fill-mode: forwards;}
+@keyframes navInLeft {
+  from {transform: translateX(-100%);}
+  to {transform: translateX(0%);}
+}
 
+
+.navOutLeft{animation: navOutLeft 0.2s; animation-fill-mode: forwards;}
+@keyframes navOutLeft {
+  from {transform: translateX(0%);}
+  to {transform: translateX(-100%);}
+}
+
+
+.navInRight{animation: navInRight 0.2s; animation-fill-mode: forwards;}
+@keyframes navInRight {
+  from {transform: translateX(100%);}
+  to {transform: translateX(0%);}
+}
+
+
+.navOutRight{animation: navOutRight 0.2s; animation-fill-mode: forwards;}
+@keyframes navOutRight {
+  from {transform: translateX(0%);}
+  to {transform: translateX(100%);}
+}
 
 
 /*font styles*/
