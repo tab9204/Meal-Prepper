@@ -25,6 +25,16 @@ var lightBox = {
   }
 }
 
+//loading gif
+//if the icon is not hidden on the page will hide iself after X seconds
+var loadingImg = {
+  view: (vnode)=>{
+    return m("#loadingImg",[
+      m("img",{src:"./assets/loading.gif"})
+    ])
+  }
+}
 
 
-export{lightBox};
+
+export{lightBox,loadingImg};

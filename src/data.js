@@ -82,6 +82,10 @@ var navigate = {
     if(shoppingList == undefined || shoppingList.length == 0){shoppingList = [""];}
     //route to the shopping list view
     m.route.set('/shop',{list: shoppingList, navIn: navIn});
+  },
+  toLoadingScreen: async()=>{
+    //route to the loading screen view
+    m.route.set('/loading');
   }
 }
 
@@ -228,8 +232,7 @@ var views = {
       //if we have added enough meals for each day in the meal plan
       else if(added == days){
         //navigate to the meal plan view. This will re-render the view with the most up to date meal plan
-        m.redraw();
-      //  navigate.toMealPlan();
+        navigate.toLoadingScreen();
       }
     },
     //deletes the current meal plan from the db

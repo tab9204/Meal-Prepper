@@ -1,7 +1,7 @@
 /*****app views****/
 //import {database} from './database.js';
 import {navigate,database,views,utilities} from './data.js'
-import {lightBox} from './components.js'
+import {lightBox,loadingImg} from './components.js'
 
 
 //view that lists all meals that have been saved in the meals db
@@ -173,6 +173,26 @@ var shoppingList = {
   }
 }
 
+//screen that shows a loading icon
+var loadingScreen = {
+  oninit: ()=>{
+    setTimeout(() => {navigate.toMealPlan();}, 2000);
+  },
+  view: (vnode)=>{
+    return m("loadingScreen#pageContainer",[
+      m("img#toShoppingList.navBtn",{src: "../assets/shoppingCart.png"}),
+      m("#mealPlanHeader.header",[
+        m("img#deleteMealPlan.navBtn",{src: "../assets/trashCan.png"}),
+        m("img#toMealList.navBtn",{src: "../assets/navigate.png"})
+      ]),
+      m("#pageContent",[
+        m(".pageSection",[
+          m(loadingImg)
+        ])
+      ])
+    ])
+  }
+}
 
 
-export{mealList,mealEdit,mealPlan,shoppingList};
+export{mealList,mealEdit,mealPlan,shoppingList,loadingScreen};
