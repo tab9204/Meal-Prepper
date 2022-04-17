@@ -9,7 +9,9 @@ var navigate = {
   //navIn => animation class to add the view to the screen
   toMealEdit: async (id,navIn)=>{
     //the meal data the edit view needs to render
-    var meal_id, name, ingredients, directions;
+    var meal_id, name, ingredients, directions, checked;
+    //boolean for if the text input should automatically focus on page render
+    var autoFocus;
     //if the id is not undefined we are editing an existing meal
     if(id !== undefined){
       //get the meal data from the db
@@ -19,6 +21,9 @@ var navigate = {
       name = meal.name;
       ingredients = meal.ingredients;
       directions = meal.directions;
+      checked = meal.checked !== undefined ? meal.checked : [];
+      //since this is an existing meal we are editing the mobile keyboard should not automatically show
+      autoFocus = false;
     }
     //if the id is undefined then we must add a new meal to the db
     else{
@@ -34,9 +39,12 @@ var navigate = {
       name = '';
       ingredients = '';
       directions = '';
+      checked = []
+      //new meal so mobile keyboard should auto show
+      autoFocus = true;
     }
     //route to the edit view passing the rendering vars
-    m.route.set('/edit', {meal:{id:meal_id, name:name, ingredients:ingredients, directions:directions}, navIn: navIn});
+    m.route.set('/edit', {meal:{id:meal_id, name:name, ingredients:ingredients, directions:directions, checked:checked}, navIn: navIn, autoFocus: autoFocus});
   },
   //navigates to the meal list view
   toMealList: async ()=>{
@@ -120,7 +128,8 @@ var views = {
     //on input change
     //e => event data
     //id => id of the meal being edited
-    onChange: (e,id)=>{
+    //id => the checked ingredients array for the meal
+    onChange: (e,id,checked)=>{
       //prevent mithril from redrawing the view
       //if we did not do this the text in the textarea would be removed
       e.redraw = false;
@@ -133,7 +142,7 @@ var views = {
         var ingredients = document.getElementById("ingredients").value;
         var directions = document.getElementById("directions").value;
         //meal data object with the values from the textareas
-        var data = {name: name, ingredients: ingredients, directions: directions}
+        var data = {name: name, ingredients: ingredients, directions: directions, checked: checked};
         //update the meal data in the db
         await database.update(database.meals,id,data);
       }, 500);

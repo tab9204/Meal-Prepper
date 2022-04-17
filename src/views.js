@@ -40,8 +40,9 @@ var mealList = {
 var mealEdit = {
   onbeforeremove: utilities.timedDelay,
   oncreate: (vnode)=>{
-    //auto focus the name
-    document.getElementById("name").focus();
+    if(vnode.attrs.autoFocus){
+      document.getElementById("name").focus();
+    }
   },
   view: (vnode)=>{
     return m("mealEdit#pageContainer",{class:vnode.attrs.navIn},[
@@ -64,13 +65,13 @@ var mealEdit = {
       ]),
       m("#pageContent",[
         m(".pageSection",[
-          m("textarea#name",{placeholder: "What's this meal called?", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id)}},vnode.attrs.meal.name)
+          m("textarea#name",{placeholder: "What's this meal called?", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.name)
         ]),
         m(".pageSection",[
-          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nOr not, its up to you.", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id)}},vnode.attrs.meal.ingredients)
+          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nOr not, its up to you.", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.ingredients)
         ]),
         m(".pageSection",[
-          m("textarea#directions",{placeholder: "Any cooking instructions can go here.", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id)}},vnode.attrs.meal.directions)
+          m("textarea#directions",{placeholder: "Any cooking instructions can go here.", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.directions)
         ])
       ])
     ])
