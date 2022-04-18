@@ -1,10 +1,10 @@
 {
-  "short_name": "template",
-  "name": "template",
+  "short_name": "Bottom Text",
+  "name": "Bottom Text",
   "icons": [
-    
+
   ],
-  "background_color": "#4D77BE",
+  "background_color": "#4281A4",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait"
