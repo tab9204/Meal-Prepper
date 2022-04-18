@@ -65,7 +65,7 @@ var mealEdit = {
       ]),
       m("#pageContent",[
         m(".pageSection",[
-          m("textarea#name",{placeholder: "What's this meal called?", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.name)
+          m("textarea#name",{placeholder: "What's this meal called?", rows: 1, oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.name)
         ]),
         m(".pageSection",[
           m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nOr not, its up to you.", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.ingredients)

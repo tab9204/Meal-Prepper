@@ -36,7 +36,7 @@ mealEdit #pageContent{display: flex; flex-direction: column; justify-content: sp
 mealEdit .pageSection:first-child{height: 20px !important;}
 mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 50%; border-top: 1px solid;}
 mealEdit .pageSection {margin: 5px;}
-mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none;}
+mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none; overflow-y: scroll;}
 mealEdit textarea:focus{outline: none;}
 
 
@@ -58,7 +58,7 @@ shoppingList .shoppingListMeal{margin: 10px; padding: 5px;}
 shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
 shoppingList .mealName{font-size: 1.5em;}
 shoppingList .mealRepeat{margin: 5px 0;}
-shoppingList .mealIngredient{font-size: 1.2em; margin: 2px 0; padding: 2px 0;}
+shoppingList .mealIngredient{font-size: 1.2em; margin: 4px 0; padding: 2px 0; display: list-item; list-style-type: decimal; list-style-position: inside;}
 shoppingList .mealIngredient.checked{text-decoration: line-through;}
 
 loadingScreen{z-index: 2; position: fixed;}
