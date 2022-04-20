@@ -5,6 +5,16 @@ import {navigate} from './data.js'
 import "../libraries/mithril.min.js";
 
 window.onload = async () =>{
+  //register service worker
+  if ('serviceWorker' in navigator) {
+    var registration = await navigator.serviceWorker.register('service-worker.js');
+    console.log("service worker registered");
+    //if the registration has been changed update it
+    registration.update();
+  }
+  else{
+    console.log("Service Workers not supported");
+  }
   //route to start the app on
   await navigate.toMealList();
   //get the root element of the app

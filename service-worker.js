@@ -1,7 +1,14 @@
-var cacheName = 'offlineCache-v1';
+var cacheName = 'offlineCache-v2';
 
 var contentToCache = [
-  './manifest.json'
+  './manifest.json',
+  './assets/loading.gif',
+  './assets/navigate.png',
+  './assets/plus.png',
+  './assets/shoppingCart.png',
+  './assets/trashCan.png',
+  './assets/WorkSans-VariableFont_wght.ttf',
+  './assets/x.png'
 ];
 
 
