@@ -22,8 +22,8 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 
 /*header bar styles */
 .header{display: flex; width: 100%; min-height: 50px;}
-  .headerImg{width: 50px; height: 50px; padding:3px;}
-  
+  .headerImg{width: 50px; height: 50px; padding:0px 0px 10px 0px}
+
 /*navigation bar styles*/
 .navBar{justify-content: space-between; width: 100%; min-height: 50px; overflow: hidden; background: #4281A4; display: flex; z-index: 2;}
   .navBtnContainer{display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 25px; position: relative;}

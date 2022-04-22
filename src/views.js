@@ -46,12 +46,6 @@ var mealEdit = {
         buttons: views.mealEdit.lightBox.buttons,
         vnode: vnode
       }),
-      m("#mealEditHeader.header",[
-        m("img#deleteMeal.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
-          //delay opening the lightbox to give time for the mobile keyboard to close
-          setTimeout(()=>{utilities.lightBox.open("mealEditLightBox")},100);
-        }}),
-      ]),
       m("#pageContent",[
         m(".pageSection",[
           m("textarea#name",{placeholder: "Provide a name for this meal.", rows: 1, oninput: (e)=>{
@@ -68,6 +62,12 @@ var mealEdit = {
             views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
           }},vnode.attrs.meal.directions)
         ])
+      ]),
+      m("#mealEditHeader.header",[
+        m("img#deleteMeal.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
+          //delay opening the lightbox to give time for the mobile keyboard to close
+          setTimeout(()=>{utilities.lightBox.open("mealEditLightBox")},100);
+        }}),
       ])
     ])
   }
@@ -93,14 +93,6 @@ var mealPlan = {
         buttons: views.mealPlan.lightBox2.buttons,
         vnode: vnode
       }),
-      m("#mealPlanHeader.header",[
-        m("img#deleteMealPlan.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
-          utilities.lightBox.open("mealPlanLightbox1");
-        }}),
-        m("img#toShoppingList.headerImg",{src: "../assets/shoppingCart.png",onclick: async ()=>{
-          await navigate.toShoppingList("navInLeft");
-        }})
-      ]),
       m("#pageContent",[
         m(".pageSection",[
           m("#mealPlanList",vnode.attrs.plan.map((day,i)=>{
@@ -118,6 +110,14 @@ var mealPlan = {
             }
           }))
         ])
+      ]),
+      m("#mealPlanHeader.header",[
+        m("img#deleteMealPlan.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
+          utilities.lightBox.open("mealPlanLightbox1");
+        }}),
+        m("img#toShoppingList.headerImg",{src: "../assets/shoppingCart.png",onclick: async ()=>{
+          await navigate.toShoppingList("navInLeft");
+        }})
       ])
     ])
   }
