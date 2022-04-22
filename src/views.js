@@ -1,32 +1,27 @@
 /*****app views****/
-//import {database} from './database.js';
-import {navigate,database,views,utilities} from './data.js'
+import {database} from './database.js';
+import {navigate,views,utilities} from './data.js'
 import {lightBox,loadingImg} from './components.js'
 
 
 //view that lists all meals that have been saved in the meals db
 var mealList = {
-  onbeforeremove: utilities.timedDelay,
   view: (vnode)=>{
     return m("mealList#pageContainer",[
-      m("#mealListHeader.header",[
-        //meal plan nav btn should be disabled if there is not at least 1 meal saved
-        m("img#toMealPlan.navBtn",{src: "../assets/navigate.png",class:vnode.attrs.meals[0] == "" ? "disabled" : "", onclick: ()=>{navigate.toMealPlan("navInLeft")}}),
-        m("img#toMealEdit.navBtn",{src: "../assets/plus.png", onclick: ()=>{navigate.toMealEdit(undefined,"navInRight")}})
-      ]),
       m("#pageContent",[
         m(".pageSection",[
           m("#mealList",vnode.attrs.meals.map((meal)=>{
             if(meal !== ""){//if the meal array is not empty
-              return m(".mealListItem",{id: meal.id, onclick: (e)=>{
-                navigate.toMealEdit(e.currentTarget.getAttribute("id"),"navInRight");
-              }},meal.doc.name == "" ? "Nameless Meal" : meal.doc.name)
+              return m(".mealListItem",{ id: meal.id, onclick: async (e)=>{
+                  await navigate.toMealEdit(meal.id,"navInRight");
+                }
+              }, meal.doc.name == "" ? "Nameless Meal" : meal.doc.name)
             }
             else{//if the meal array is empty
               return m("#explainationText",[
                 m("div", "You haven't added any meals yet!"),
-                m("div", "Use the top right icon to add some meals."),
-                m("div", "Once you have some meals added you can use the top left icon to create a meal plan."),
+                m("div", "Use the bottom right icon to add some meals."),
+                m("div", "Once you have some meals added you can use the bottom left icon to create a meal plan."),
               ])
             }
           }))
@@ -38,7 +33,6 @@ var mealList = {
 
 //view for editing a meal's data
 var mealEdit = {
-  onbeforeremove: utilities.timedDelay,
   oncreate: (vnode)=>{
     if(vnode.attrs.autoFocus){
       document.getElementById("name").focus();
@@ -46,32 +40,33 @@ var mealEdit = {
   },
   view: (vnode)=>{
     return m("mealEdit#pageContainer",{class:vnode.attrs.navIn},[
-      m(lightBox,{// delete the current meal
+      m(lightBox,{//delete the current meal
         id: views.mealEdit.lightBox.id,
         text: views.mealEdit.lightBox.text,
         buttons: views.mealEdit.lightBox.buttons,
         vnode: vnode
       }),
       m("#mealEditHeader.header",[
-        m("img#toMealList.navBtn",{src: "../assets/navigate.png", onclick: ()=>{
-          //add the navigation out animation class to the view
-          navigate.toMealList();
-          vnode.dom.classList.add("navOutRight");
-        }}),
-        m("img#deleteMeal.navBtn",{src: "../assets/trashCan.png", onclick: async ()=>{
+        m("img#deleteMeal.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
           //delay opening the lightbox to give time for the mobile keyboard to close
           setTimeout(()=>{utilities.lightBox.open("mealEditLightBox")},100);
         }}),
       ]),
       m("#pageContent",[
         m(".pageSection",[
-          m("textarea#name",{placeholder: "What's this meal called?", rows: 1, oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.name)
+          m("textarea#name",{placeholder: "Provide a name for this meal.", rows: 1, oninput: (e)=>{
+            views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
+          }},vnode.attrs.meal.name)
         ]),
         m(".pageSection",[
-          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nOr not, its up to you.", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.ingredients)
+          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.", oninput: (e)=>{
+            views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
+          }},vnode.attrs.meal.ingredients)
         ]),
         m(".pageSection",[
-          m("textarea#directions",{placeholder: "Any cooking instructions can go here.", oninput: (e)=>{views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked)}},vnode.attrs.meal.directions)
+          m("textarea#directions",{placeholder: "Add cooking instructions for the meal here.", oninput: (e)=>{
+            views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
+          }},vnode.attrs.meal.directions)
         ])
       ])
     ])
@@ -80,7 +75,6 @@ var mealEdit = {
 
 //view for generating a meal plan or displaying an exiting one
 var mealPlan = {
-  onbeforeremove: utilities.timedDelay,
   oncreate: (vnode)=>{
     //if there is no current meal plan open the meal plan selection lightbox
     if(vnode.attrs.plan == ""){utilities.lightBox.open("mealPlanLightBox2");}
@@ -99,13 +93,12 @@ var mealPlan = {
         buttons: views.mealPlan.lightBox2.buttons,
         vnode: vnode
       }),
-      m("img#toShoppingList.navBtn",{src: "../assets/shoppingCart.png",onclick: async ()=>{await navigate.toShoppingList("navInLeft");}}),
       m("#mealPlanHeader.header",[
-        m("img#deleteMealPlan.navBtn",{src: "../assets/trashCan.png", onclick: async ()=>{utilities.lightBox.open("mealPlanLightbox1");}}),
-        m("img#toMealList.navBtn",{src: "../assets/navigate.png", onclick: ()=>{
-          navigate.toMealList();
-          //add the navigation out animation class to the view
-          vnode.dom.classList.add("navOutLeft");
+        m("img#deleteMealPlan.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
+          utilities.lightBox.open("mealPlanLightbox1");
+        }}),
+        m("img#toShoppingList.headerImg",{src: "../assets/shoppingCart.png",onclick: async ()=>{
+          await navigate.toShoppingList("navInLeft");
         }})
       ]),
       m("#pageContent",[
@@ -133,23 +126,15 @@ var mealPlan = {
 //view that generates and displays a shopping list
 //lists everything needed to cook the entire meal plan
 var shoppingList = {
-  onbeforeremove: utilities.timedDelay,
   view: (vnode)=>{
     return m("shoppingList#pageContainer",{class:vnode.attrs.navIn},[
-      m("#shoppingListHeader.header",[
-        m("img#tomealPlan.navBtn",{src: "../assets/navigate.png", onclick: ()=>{
-          navigate.toMealPlan();
-          //add the navigation out animation class to the view
-          vnode.dom.classList.add("navOutLeft");
-        }})
-      ]),
       m("#pageContent",[
         m(".pageSection",[
           m("#shoppingList",vnode.attrs.list.map((item,i)=>{
             if(item !== ""){//if the shopping list is not empty
               return m(".shoppingListMeal",{item_id: item.meal_id, repeat: item.repeat},[
                 m(".nameContainer",[
-                  m(".mealName",item.name),
+                  m(".mealName",item.name == "" ? "Nameless Meal" : item.name),
                   m(".mealRepeat",item.repeat >= 2 ?  "x" + item.repeat : "")
                 ]),
                 item.ingredients.map((ingredient,i)=>{
@@ -159,7 +144,7 @@ var shoppingList = {
                     }},ingredient)
                   }
                   else{
-                    return m("div","None")
+                    return m("div","No ingredients needed")
                   }
                 })
               ])
@@ -181,11 +166,6 @@ var loadingScreen = {
   },
   view: (vnode)=>{
     return m("loadingScreen#pageContainer",[
-      m("img#toShoppingList.navBtn",{src: "../assets/shoppingCart.png"}),
-      m("#mealPlanHeader.header",[
-        m("img#deleteMealPlan.navBtn",{src: "../assets/trashCan.png"}),
-        m("img#toMealList.navBtn",{src: "../assets/navigate.png"})
-      ]),
       m("#pageContent",[
         m(".pageSection",[
           m(loadingImg)

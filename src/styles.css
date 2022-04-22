@@ -5,11 +5,12 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 .disabled{pointer-events: none !important;}
 ::-webkit-scrollbar {width: 0px;}
 .navBtn{width: 50px; height: 50px;}
-.header{display: flex; background: #4281A4;}
 
-#appRoot{position: relative; height: 100%;}
-  #pageContainer{height: 100%; display: flex; flex-direction: column; background: white; width: 100%;}
-    #pageContent{padding: 8px; overflow-y: scroll; max-width: 640px; position: relative; left: 50%; transform: translateX(-50%); height: 100%;}
+#appRoot{height: 100%;display: flex; flex-direction: column;}
+  #pageRoot{height: 100%}
+    #pageContainer{height: 100%; display: flex; flex-direction: column; background: white; width: 100%;}
+      #pageContent{padding: 8px; overflow-y: scroll; max-width: 640px; position: relative; left: 50%; transform: translateX(-50%); height: 100%;}
+  #navRoot{display: flex;}
 
 .lightBoxContainer.closed{display: none !important;}
 .lightBoxContainer.open{display: block !important;}
@@ -19,54 +20,54 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
     .lightBoxButtons{display: flex; justify-content: space-around;}
       .lightboxBtn{padding: 5px; background: #B2FFA9; border:1px solid; border-radius: 5px;}
 
+/*header bar styles */
+.header{display: flex; width: 100%; min-height: 50px;}
+  .headerImg{width: 50px; height: 50px; padding:3px;}
+  
+/*navigation bar styles*/
+.navBar{justify-content: space-between; width: 100%; min-height: 50px; overflow: hidden; background: #4281A4; display: flex; z-index: 2;}
+  .navBtnContainer{display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 25px; position: relative;}
+  .btnBackground{width: 10px; height: 10px; background: white; transform-origin: center; border-radius: 20px; position: absolute;}
+  .btnImage {position: absolute; width: 50px; height: 50px; padding: 3px;}
+    #toMealEdit {transform: rotate(180deg);}
+
 
 /**view styles***/
-mealList{z-index: 1; position: absolute;}
-mealList #mealListHeader{ justify-content: space-between;}
-mealList #toMealEdit {transform: rotate(180deg);}
 mealList #mealList{display: flex; flex-wrap: wrap; justify-content: space-between;}
-mealList .mealListItem{border: 1px solid; border-radius: 3px; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; width: 45%; background:#B2FFA9;}
+  mealList .mealListItem{border: 1px solid; border-radius: 3px; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; width: 45%; background:#B2FFA9;}
 mealList #explainationText div{margin: 5px 0 20px 0; font-size: 1.5em; padding:5px;}
 
 
-mealEdit{z-index: 2; position: fixed;}
 mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
-mealEdit #mealEditHeader{justify-content: space-between;}
-mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
-mealEdit .pageSection:first-child{height: 20px !important;}
-mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 50%; border-top: 1px solid;}
-mealEdit .pageSection {margin: 5px;}
-mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none; overflow-y: scroll;}
-mealEdit textarea:focus{outline: none;}
+  mealEdit .header{justify-content: end;}
+  mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
+  mealEdit .pageSection:first-child{height: 20px !important;}
+  mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 50%; border-top: 1px solid;}
+  mealEdit .pageSection {margin: 5px;}
+    mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none; overflow-y: scroll;}
+    mealEdit textarea:focus{outline: none;}
 
 
-mealPlan{z-index: 2; position: fixed;}
-mealPlan #mealPlanHeader{justify-content: space-between;}
-mealPlan #toMealList {transform: rotate(180deg);}
-mealPlan #toShoppingList{position: absolute; bottom: 5px; left: 5px; border-radius: 30px; border: 1px solid; z-index: 2;}
+mealPlan .header{justify-content: space-between;}
 mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 18px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#B2FFA9;}
-mealPlan .mealDay.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important;}
-mealPlan .mealCheck{width: 28px; position: absolute; left: -12px; top: -12px; border: 1px solid; border-radius: 20px; background: white;}
-mealPlan .mealNumber{border-right: 1px solid; padding: 0 10px 0 10px;}
-mealPlan .mealName{margin-left: 20px;}
+  mealPlan .mealDay.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important;}
+  mealPlan .mealCheck{width: 28px; position: absolute; left: -12px; top: -12px; border: 1px solid; border-radius: 20px; background: white;}
+  mealPlan .mealNumber{border-right: 1px solid; padding: 0 10px 0 10px;}
+  mealPlan .mealName{margin-left: 20px;}
 
 
-shoppingList{z-index: 3; position: fixed;}
-shoppingList #shoppingListHeader{justify-content: end;}
-shoppingList #toMealPlan {transform: rotate(180deg);}
 shoppingList .shoppingListMeal{margin: 10px; padding: 5px;}
-shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
-shoppingList .mealName{font-size: 1.5em;}
-shoppingList .mealRepeat{margin: 5px 0;}
-shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 2px 0; display: list-item; list-style-type: disc; list-style-position: inside;}
-shoppingList .mealIngredient.checked{text-decoration: line-through;}
+  shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
+  shoppingList .mealName{font-size: 1.5em;}
+  shoppingList .mealRepeat{margin: 5px 0;}
+  shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 2px 0; display: list-item; list-style-type: disc; list-style-position: inside;}
+  shoppingList .mealIngredient.checked{text-decoration: line-through;}
 
-loadingScreen{z-index: 2; position: fixed;}
-loadingScreen #mealPlanHeader{justify-content: space-between;}
-loadingScreen #toMealList {transform: rotate(180deg);}
-loadingScreen #toShoppingList{position: absolute; bottom: 5px; left: 5px; border-radius: 30px; border: 1px solid; z-index: 2;}
 loadingScreen #loadingImg{position: absolute; width: 100%; height: 100%; z-index: 2; background: white;}
 loadingScreen #loadingImg img{position: relative; left: 50%; top: 50%; transform: translate(-50%,-50%);}
+loadingScreen #toMealPlan{pointer-events: none !important;}
+loadingScreen #toMealList{pointer-events: none !important;}
+loadingScreen #toMealEdit{pointer-events: none !important;}
 
 /*Animations*/
 .navInLeft{animation: navInLeft 0.2s; animation-fill-mode: forwards;}
@@ -94,6 +95,13 @@ loadingScreen #loadingImg img{position: relative; left: 50%; top: 50%; transform
 @keyframes navOutRight {
   from {transform: translateX(0%);}
   to {transform: translateX(100%);}
+}
+
+.pulse{animation: pulse 0.75s; animation-iteration-count: 1; animation-fill-mode: forwards;}
+@keyframes pulse {
+  0% {transform: scale(0); opacity: .5;}
+  50% {transform: scale(10);}
+  to {transform: scale(10); opacity: 0;}
 }
 
 
