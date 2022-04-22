@@ -1,4 +1,4 @@
-var cacheName = 'offlineCache-v2';
+var cacheName = 'offlineCache-v4';
 
 var contentToCache = [
   './manifest.json',
@@ -7,8 +7,12 @@ var contentToCache = [
   './assets/plus.png',
   './assets/shoppingCart.png',
   './assets/trashCan.png',
+  './assets/home.png',
+  './assets/plan.png',
   './assets/WorkSans-VariableFont_wght.ttf',
-  './assets/x.png'
+  './assets/x.png',
+  './libraries/mithril.min.js',
+  './libraries/pouchdb-7.2.1.js'
 ];
 
 

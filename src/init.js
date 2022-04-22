@@ -2,6 +2,7 @@
 //import views and the mithril library
 import {mealList,mealEdit,mealPlan,shoppingList,loadingScreen} from './views.js';
 import {navigate} from './data.js'
+import {navBar} from './components.js'
 import "../libraries/mithril.min.js";
 
 window.onload = async () =>{
@@ -15,12 +16,16 @@ window.onload = async () =>{
   else{
     console.log("Service Workers not supported");
   }
-  //route to start the app on
+  //get the nav root container
+  var navRoot = document.getElementById("navRoot");
+  //render the navBar to the nav root container
+  m.render(navRoot, m(navBar));
+  //app should start on the meal list
   await navigate.toMealList();
-  //get the root element of the app
-  var root = document.body.children[0];
+  //get the page root container
+  var pageRoot = document.getElementById("pageRoot");
   //set up the app routes
-  m.route(root, "/list",{
+  m.route(pageRoot, "/list",{
     "/list": mealList,
     "/edit": mealEdit,
     "/plan": mealPlan,

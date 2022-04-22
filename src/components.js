@@ -1,5 +1,5 @@
 /*****view components****/
-//import {data} from './data.js'
+import {navigate,utilities} from './data.js'
 
 //on screen lightbox that shows in front of all other content in the view
 //needs to be passed:
@@ -26,7 +26,6 @@ var lightBox = {
 }
 
 //loading gif
-//if the icon is not hidden on the page will hide iself after X seconds
 var loadingImg = {
   view: (vnode)=>{
     return m("#loadingImg",[
@@ -35,6 +34,47 @@ var loadingImg = {
   }
 }
 
+//navigation bar containing buttons to navigate app views
+var navBar = {
+  view: (vnode)=>{
+    return m(".navBar",[
+      m(".navBtnContainer",[
+        m("img#toMealPlan.btnImage",{//nav button, to meal plan
+          src: "../assets/plan.png",
+          onclick: async (e)=>{
+            //add the pulse animation
+            navigate.addPulse(e);
+            //navigate to the meal edit view
+            await navigate.toMealPlan();
+          }
+        })
+      ]),
+      m(".navBtnContainer",[
+        m("img#toMealList.btnImage",{//nav button, to meal list
+          src: "../assets/home.png",
+          onclick: async (e)=>{
+            //add the pulse animation
+            navigate.addPulse(e);
+            //navigate to the meal edit view
+            await navigate.toMealList();
+          }
+        })
+      ]),
+      m(".navBtnContainer",[
+        m("img#toMealEdit.btnImage",{//nav button, to meal edit
+          src: "../assets/plus.png",
+          onclick: async (e)=>{
+            //add the pulse animation
+            navigate.addPulse(e);
+            //navigate to the meal edit view
+            await navigate.toMealEdit(undefined);
+          }
+        })
+      ])
+    ])
+  }
+}
 
 
-export{lightBox,loadingImg};
+
+export{lightBox,loadingImg,navBar};

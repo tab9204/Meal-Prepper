@@ -1,13 +1,12 @@
 /**********Data for rendering app views************/
-//import {database} from './database.js';
+import {database} from './database.js';
 import "../libraries/pouchdb-7.2.1.js";
 
 //navigating app views
 var navigate = {
   //navigates to the meal edit view
   //id => the id of the meal to display for editing
-  //navIn => animation class to add the view to the screen
-  toMealEdit: async (id,navIn)=>{
+  toMealEdit: async (id)=>{
     //the meal data the edit view needs to render
     var meal_id, name, ingredients, directions, checked;
     //boolean for if the text input should automatically focus on page render
@@ -25,15 +24,15 @@ var navigate = {
       //since this is an existing meal we are editing the mobile keyboard should not automatically show
       autoFocus = false;
     }
-    //if the id is undefined then we must add a new meal to the db
+    //if the id is undefined then we are creating a brand new meal
     else{
       //generate a unique id for the new meal
       var new_id = '' + Date.now();
       //meal data to store in the db
       //since its new the data should default to empty
-      var data = {name: '', ingredients:'', directions:'', checked: []};
+      //var data = {name: '', ingredients:'', directions:'', checked: []};
       //add the new meal to the db
-      await database.add(database.meals,new_id,data);
+      //await database.add(database.meals,new_id,data);
       //rendering vars default to empty
       meal_id = new_id;
       name = '';
@@ -44,7 +43,7 @@ var navigate = {
       autoFocus = true;
     }
     //route to the edit view passing the rendering vars
-    m.route.set('/edit', {meal:{id:meal_id, name:name, ingredients:ingredients, directions:directions, checked:checked}, navIn: navIn, autoFocus: autoFocus});
+    m.route.set('/edit', {meal:{id:meal_id, name:name, ingredients:ingredients, directions:directions, checked:checked}, autoFocus: autoFocus});
   },
   //navigates to the meal list view
   toMealList: async ()=>{
@@ -56,8 +55,7 @@ var navigate = {
     m.route.set('/list', {meals: allMeals});
   },
   //navigates to the meal plan view
-  //navIn => animation class to add the view to the screen
-  toMealPlan: async (navIn)=>{
+  toMealPlan: async ()=>{
     //array of objects needed to render the meal plan view
     //each object is a meal consisting of:
       //the name of the meal, the meal id, the id of the day in the meal plan db, and a checked boolean
@@ -81,19 +79,35 @@ var navigate = {
       renderData = [""];
     }
     //route to the mealPlan view passing the render data to the view
-    m.route.set('/plan',{plan: renderData, navIn: navIn});
+    m.route.set('/plan',{plan: renderData});
   },
-  //navIn => animation class to add the view to the screen
-  toShoppingList: async (navIn)=>{
+  //navigates to the shopping list view
+  toShoppingList: async ()=>{
     //create the shopping list
     var shoppingList = await views.shoppingList.createList();
     if(shoppingList == undefined || shoppingList.length == 0){shoppingList = [""];}
     //route to the shopping list view
-    m.route.set('/shop',{list: shoppingList, navIn: navIn});
+    m.route.set('/shop',{list: shoppingList});
   },
   toLoadingScreen: async()=>{
     //route to the loading screen view
     m.route.set('/loading');
+  },
+  //adds a pulse animation to a navigation button on click
+  //e => element that triggered the click event
+  addPulse: (e)=>{
+    //create the background pulse element
+    var pulse = document.createElement('div');
+    pulse.classList.add('btnBackground', 'pulse');
+    //add an animationend event listener to the new element
+    pulse.addEventListener("animationend",(e)=>{
+      //when the pulse animation ends remove the element from the dom
+      e.currentTarget.remove();
+    });
+    //get the parent container  of the nav button that was clicked
+    var container = e.currentTarget.parentElement;
+    //add the background pulse to the parent container, adding it before the button
+    container.insertBefore(pulse,container.children[0]);
   }
 }
 
@@ -143,8 +157,16 @@ var views = {
         var directions = document.getElementById("directions").value;
         //meal data object with the values from the textareas
         var data = {name: name, ingredients: ingredients, directions: directions, checked: checked};
-        //update the meal data in the db
-        await database.update(database.meals,id,data);
+        //check if this meal already exists in the db or is brand new
+        var meal = await database.get(database.meals,id);
+        //if the meal is not blank then it already exits in the db and we can update it
+        if(meal !== ""){
+          await database.update(database.meals,id,data);
+        }
+        //otherwise the meal doesnt exits and we should add it to the db
+        else if (meal == ""){
+          await database.add(database.meals,id,data);
+        }
       }, 500);
     }
   },
@@ -177,37 +199,33 @@ var views = {
       buttons: [
         {
           click: async (vnode)=>{
-            await views.mealPlan.howLong(3);
+            await views.mealPlan.createPlan(3,0);
+            utilities.lightBox.close("mealPlanLightBox2");
           },
           text: "3 Days"
         },
         {
           click: async (vnode)=>{
-            await views.mealPlan.howLong(5);
+            await views.mealPlan.createPlan(5,0);
+            utilities.lightBox.close("mealPlanLightBox2");
           },
           text: "5 Days"
         },
         {
           click: async (vnode)=>{
-            await views.mealPlan.howLong(7);
+            await views.mealPlan.createPlan(7,0);
+            utilities.lightBox.close("mealPlanLightBox2");
           },
           text: "7 Days"
         },
         {
           click: async (vnode)=>{
-            await views.mealPlan.howLong(14);
+            await views.mealPlan.createPlan(14,0);
+            utilities.lightBox.close("mealPlanLightBox2");
           },
           text: "14 Days"
         },
       ]
-    },
-    //gathers how many days should be in a meal plan before calling createPlan
-    //numDays => how many days are in the plan
-    howLong: async (numDays) =>{
-      //call createPlan with the number of days selected
-      await views.mealPlan.createPlan(numDays,0);
-      //close the selection lightbox
-      utilities.lightBox.close("mealPlanLightBox2");
     },
     //creates a meal plan by adding X number of entries to the mealPlan db
     //days => number of days and meals in the meal plan
@@ -270,8 +288,6 @@ var views = {
     //day_id => id of the day clicked on
     //meal_id => id of the meal on the day clicked on
     checkOffDay: async (e,day_id,meal_id)=>{
-      //stop event propagation so that this is the only event that fires
-      e.stopPropagation();
       //toggle the checked class on the button's parent element
       e.currentTarget.classList.toggle("checked");
       //get the meal plan data so that that the db entry can be updated
@@ -389,112 +405,13 @@ const utilities ={
       catch(e){console.log("No lightbox on this view");}
     }
   },
-  //resolves a promise after an animation has ended
-  //used to delay removing a view until after that view's animation has ended
-  animationDelay: (vnode) =>{
-    //defer removing the view until after the nav out animation finishes
-    return new Promise((resolve)=> {
-        vnode.dom.addEventListener("animationend", resolve);
-    })
-  },
-  //resolves a promise after a set amount of time
-  timedDelay: ()=>{
+  //returns a promise to delay the remove of an element from the dom
+  //used when navigating between app pages
+  timedDelay: (time)=>{
     //wait 300 ms to allow time for the nav animation to finish
-    return new Promise((resolve) => {setTimeout(() => {resolve()}, 300)});
-  }
-}
-
-//functions for interacting with the database
-var database = {
-  //db to store all meals
-  //each entry is an individual meal that contains:
-    //name => name of the meal
-    //ingredients => string that contains all ingredients for the meal
-    //directions => string that contains all directions for the meal
-    //checked => array containing ingredients that have been checked off on the shopping list
-  meals: new PouchDB('meals'),
-  //stores a list of days that make up a meal plan
-  //each entry is a day in the meal plan that contains:
-    //meal_id => id of the meal on that day of the meal plan
-    //checked => a boolean for if the day was checked off or not
-  mealPlan: new PouchDB("mealPlan"),
-  //returns all entries in a specified db
-  //db => the database to query
-  getAll: async (db)=>{
-    var all;
-    try{
-      all = await db.allDocs({include_docs: true});
-      //if the db is empty return an array with an empty string
-      //we do this because an empty array cannot be passed to the view as data. The array needs something in it
-      if(all.rows.length <= 0){all.rows = [""];}
-    }
-    catch(e){throw new Error(e);}
-    return all.rows;
+    return new Promise((resolve) => {setTimeout(() => {resolve()}, 750)});
   },
-  //returns 1 entry from the specified db
-  //db => the database to query
-  //id => id of the entry to return
-  get: async (db,id)=>{
-    var entry;
-    try{
-      entry = await db.get(id);
-    }
-    catch(e){
-      //if the entry is missing
-      if(e.status = 404){
-        //return an empty entry
-        entry = "";
-      }
-      else{
-        throw new Error(e);
-      }    }
-    return entry;
-  },
-  //adds a new entry to the specified db
-  //db => the database being added to
-  //id => unique id for the new entry
-  //data => object containing the data for the new entry
-  add: async (db,id,data)=>{
-    try{
-      //put the id into an object with the proper _id property
-      var entry_id = {_id:id};
-      //combine the entry_id object and data object into one single objecg
-      var new_entry = Object.assign(entry_id, data);
-      //put the new entry into the db
-      await db.put(new_entry);
-    }
-    catch(e){throw new Error(e);}
-  },
-  //updates the data of an entry in a specified db
-  //db => the database containing the entry being updated
-  //id => id of the entry being updated
-  //data => object containing the updated data for the entry
-  update: async (db,id,data)=>{
-    try{
-      //get the entry to be updated from the db so we can get its current _rev property value
-      var entry = await db.get(id);
-      //create an object containg the updated entry's id and rev properties
-      var props = {_id:id, _rev: entry._rev};
-      //combine the props and data objects
-      var updated_entry = Object.assign(props, data);
-      //add the updated entry to the specified db
-      await db.put(updated_entry);
-    }
-    catch(e){throw new Error(e);}
-  },
-  //deletes an entry from the specified db
-  //db = database the entry is being deleted from
-  //id => id of the entry to delete
-  delete: async (db,id)=>{
-    try{
-      //get the entry to be deleted from the db
-      var entry = await db.get(id);
-      //delete the entry from the db
-      await db.remove(entry);
-    }
-    catch(e){throw new Error(e);}
-  }
 }
 
 
-export{navigate,database,views,utilities};
+export{navigate,views,utilities};
