@@ -8,7 +8,7 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 
 #appRoot{height: 100%;display: flex; flex-direction: column; box-sizing: border-box; padding-top: 50px;}
   #pageRoot{height: 100%}
-    #pageContainer{height: 100%; display: flex; flex-direction: column; background: white; width: 100%;}
+    #pageContainer{height: 100%; display: flex; flex-direction: column; background: #faf9f6; width: 100%;}
       #pageContent{padding: 8px; overflow-y: scroll; max-width: 640px; position: relative; left: 50%; transform: translateX(-50%); height: 100%;}
   #navRoot{display: flex; margin-top: -50px;}
 
@@ -19,10 +19,6 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
     .lightBox .lightboxText{margin-bottom: 10px;}
     .lightBoxButtons{display: flex; justify-content: space-around;}
       .lightboxBtn{padding: 5px; background: #86CB92; border:1px solid; border-radius: 5px;}
-
-/*header bar styles */
-.header{display: flex; width: 100%; min-height: 50px; position: absolute; bottom: 0px;}
-  .headerImg{width: 50px; height: 50px; padding:0px 0px 10px 0px; z-index: 2; background: white;}
 
 /*navigation bar styles*/
 .navBar{justify-content: space-between; width: 100%; min-height: 50px; overflow: hidden; background: #4281A4; display: flex; z-index: 2;}
@@ -47,17 +43,18 @@ mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
   mealEdit .pageSection:first-child{height: 20px !important;}
   mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 50%; border-top: 1px solid;}
   mealEdit .pageSection {margin: 5px;}
-    mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none; overflow-y: scroll;}
+    mealEdit textarea{resize: none; width: 100%; height: 100%; padding:5px; border:none; overflow-y: scroll; background: #faf9f6;}
     mealEdit textarea:focus{outline: none;}
 
 
-mealPlan .header{justify-content: space-between;}
-mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 15px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#86CB92;}
+mealPlan #mealPlanMenu {display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; background: #86CB92; border: 1px solid; width: 65px; height: 140px; align-items: center; box-shadow: 0.5px 1px 1px hsl(220deg 60% 50% / 70%); transform-origin: bottom left; padding: 5px;}
+  .menuOpen{width: 50px; height: 50px;position: absolute; bottom: 0px;}
+  .menuIcon{width: 50px; height: 50px; padding:0px 5px 10px 0px; z-index: 2;}
+mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 15px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#86CB92; box-shadow: 0.5px 1px 1px hsl(220deg 60% 50% / 0.7);}
   mealPlan .mealDay.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important;}
   mealPlan .mealCheck{width: 28px; position: absolute; left: -12px; top: -12px; border: 1px solid; border-radius: 20px; background: white;}
   mealPlan .mealNumber{border-right: 1px solid; padding: 0 10px 0 10px;}
   mealPlan .mealName{margin-left: 20px;}
-
 
 shoppingList .shoppingListMeal{margin: 10px; padding: 5px;}
   shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
@@ -100,11 +97,17 @@ loadingScreen #toMealEdit{pointer-events: none !important;}
   to {transform: translateX(100%);}
 }
 
+.scaleUp{animation: scaleUp 0.3s; animation-iteration-count: 1; animation-fill-mode: forwards;}
+@keyframes scaleUp {
+  0% {transform: scale(0);}
+  100% {transform: scale(1);}
+}
+
 .pulse{animation: pulse 0.75s; animation-iteration-count: 1; animation-fill-mode: forwards;}
 @keyframes pulse {
   0% {transform: scale(0); opacity: .5;}
   50% {transform: scale(10);}
-  to {transform: scale(10); opacity: 0;}
+  100% {transform: scale(10); opacity: 0;}
 }
 
 

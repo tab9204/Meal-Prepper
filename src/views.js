@@ -54,7 +54,7 @@ var mealEdit = {
     }
   },
   view: (vnode)=>{
-    return m("mealEdit#pageContainer",{class:vnode.attrs.navIn},[
+    return m("mealEdit#pageContainer",[
       m("#pageContent",[
         m(".pageSection",[
           m("textarea#name",{placeholder: "Provide a name for this meal.", rows: 1, oninput: (e)=>{
@@ -83,7 +83,7 @@ var mealPlan = {
     if(vnode.attrs.plan == ""){utilities.lightBox.open("mealPlanLightBox2");}
   },
   view: (vnode)=>{
-    return m("mealPlan#pageContainer",{class:vnode.attrs.navIn},[
+    return m("mealPlan#pageContainer",[
       m(lightBox,{//delete the current meal plan
         id: views.mealPlan.lightBox1.id,
         text: views.mealPlan.lightBox1.text,
@@ -96,7 +96,9 @@ var mealPlan = {
         buttons: views.mealPlan.lightBox2.buttons,
         vnode: vnode
       }),
-      m("#pageContent",[
+      m("#pageContent",{onmousedown: ()=>{
+        document.getElementById("mealPlanMenu").classList.add("hidden");
+      }},[
         m(".pageSection",[
           m("#mealPlanList",vnode.attrs.plan.map((day,i)=>{
             if(day !== ""){//if the meal plan array is not empty
@@ -114,11 +116,14 @@ var mealPlan = {
           }))
         ])
       ]),
-      m("#mealPlanHeader.header",[
-        m("img#deleteMealPlan.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
+      m("img.menuOpen",{src:"../assets/menu.png", onclick: ()=>{
+        document.getElementById("mealPlanMenu").classList.remove("hidden");
+      }}),
+      m("#mealPlanMenu.hidden.scaleUp",[
+        m("img#deleteMealPlan.menuIcon",{src: "../assets/trashCan.png", onclick: async ()=>{
           utilities.lightBox.open("mealPlanLightbox1");
         }}),
-        m("img#toShoppingList.headerImg",{src: "../assets/shoppingCart.png",onclick: async ()=>{
+        m("img#toShoppingList.menuIcon",{src: "../assets/shoppingCart.png",onclick: async ()=>{
           await navigate.toShoppingList();
         }})
       ])
@@ -130,7 +135,7 @@ var mealPlan = {
 //lists everything needed to cook the entire meal plan
 var shoppingList = {
   view: (vnode)=>{
-    return m("shoppingList#pageContainer",{class:vnode.attrs.navIn},[
+    return m("shoppingList#pageContainer",[
       m("#pageContent",[
         m(".pageSection",[
           m("#shoppingList",vnode.attrs.list.map((item,i)=>{
