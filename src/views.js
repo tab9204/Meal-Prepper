@@ -8,14 +8,29 @@ import {lightBox,loadingImg} from './components.js'
 var mealList = {
   view: (vnode)=>{
     return m("mealList#pageContainer",[
+      m(lightBox,{//delete the current meal
+        id:  views.mealList.lightBox.id,
+        text:  views.mealList.lightBox.text,
+        buttons: views.mealList.lightBox.buttons
+      }),
       m("#pageContent",[
         m(".pageSection",[
           m("#mealList",vnode.attrs.meals.map((meal)=>{
             if(meal !== ""){//if the meal array is not empty
-              return m(".mealListItem",{ id: meal.id, onclick: async (e)=>{
-                  await navigate.toMealEdit(meal.id,"navInRight");
-                }
-              }, meal.doc.name == "" ? "Nameless Meal" : meal.doc.name)
+              return m(".mealListItem",{ id: meal.id}, [
+                m(".mealItemName", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
+                m(".mealItemBtns",[
+                  m("img.mealItemDelete",{src: "../assets/trashCan.png", onclick: async ()=>{
+                    //set the meal id for the lightbox so we delete the correct meal
+                    views.mealList.lightBox.meal_id =  meal.id;
+                    //open the lightbox
+                    setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
+                  }}),
+                  m("img.mealItemEdit",{src: "../assets/navigate.png", onclick: async (e)=>{
+                      await navigate.toMealEdit(meal.id);
+                  }})
+                ])
+              ])
             }
             else{//if the meal array is empty
               return m("#explainationText",[
@@ -40,12 +55,6 @@ var mealEdit = {
   },
   view: (vnode)=>{
     return m("mealEdit#pageContainer",{class:vnode.attrs.navIn},[
-      m(lightBox,{//delete the current meal
-        id: views.mealEdit.lightBox.id,
-        text: views.mealEdit.lightBox.text,
-        buttons: views.mealEdit.lightBox.buttons,
-        vnode: vnode
-      }),
       m("#pageContent",[
         m(".pageSection",[
           m("textarea#name",{placeholder: "Provide a name for this meal.", rows: 1, oninput: (e)=>{
@@ -62,12 +71,6 @@ var mealEdit = {
             views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
           }},vnode.attrs.meal.directions)
         ])
-      ]),
-      m("#mealEditHeader.header",[
-        m("img#deleteMeal.headerImg",{src: "../assets/trashCan.png", onclick: async ()=>{
-          //delay opening the lightbox to give time for the mobile keyboard to close
-          setTimeout(()=>{utilities.lightBox.open("mealEditLightBox")},100);
-        }}),
       ])
     ])
   }
@@ -116,7 +119,7 @@ var mealPlan = {
           utilities.lightBox.open("mealPlanLightbox1");
         }}),
         m("img#toShoppingList.headerImg",{src: "../assets/shoppingCart.png",onclick: async ()=>{
-          await navigate.toShoppingList("navInLeft");
+          await navigate.toShoppingList();
         }})
       ])
     ])
@@ -162,7 +165,17 @@ var shoppingList = {
 //screen that shows a loading icon
 var loadingScreen = {
   oninit: ()=>{
-    setTimeout(() => {navigate.toMealPlan();}, 2000);
+    //disable the nav buttons so the user cannot navigate away during the animation load
+    document.querySelectorAll("#toMealPlan, #toMealList, #toMealEdit").forEach((element) => {
+      element.classList.add("disabled");
+    });
+    setTimeout(() => {
+      document.querySelectorAll("#toMealPlan, #toMealList, #toMealEdit").forEach((element) => {
+        element.classList.remove("disabled");
+      });
+      //navigate back to the meal plan
+      navigate.toMealPlan();
+    }, 2000);
   },
   view: (vnode)=>{
     return m("loadingScreen#pageContainer",[

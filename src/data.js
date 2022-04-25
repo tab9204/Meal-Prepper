@@ -113,32 +113,37 @@ var navigate = {
 
 //view specific data, functions and events
 var views = {
-  //the mealEdit view
-  mealEdit:{
-    //reference to the setTimout function
-    timeout: null,
-    //data needed for lightbox rendering
+  mealList: {
     lightBox: {
-      id: "mealEditLightBox",
+      meal_id: null, //the id of the meal that should be deleted if the user selects delete
+      id: "mealListLightBox",
       text: "Are you sure you want to delete this meal?",
       buttons: [
         {
           click: async (vnode)=>{
-            await database.delete(database.meals,vnode.attrs.meal.id);
-            navigate.toMealList();
-            //animate the view out
-            vnode.dom.classList.add("navOutRight");
+            //delete the selected recipe from the db
+            await database.delete(database.meals,views.mealList.lightBox.meal_id);
+            //reload the meal list page by navigating back to it
+            await navigate.toMealList();
+            //close the lightbox
+            utilities.lightBox.close(views.mealList.lightBox.id);
           },
           text: "Delete"
         },
         {
           click: (vnode) =>{
-            utilities.lightBox.close(views.mealEdit.lightBox.id);
+            //close the lightbox
+            utilities.lightBox.close(views.mealList.lightBox.id);
           },
           text: "Cancel"
         }
       ]
-    },
+    }
+  },
+  //the mealEdit view
+  mealEdit:{
+    //reference to the setTimout function
+    timeout: null,
     //on input change
     //e => event data
     //id => id of the meal being edited

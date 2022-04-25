@@ -21,8 +21,8 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
       .lightboxBtn{padding: 5px; background: #B2FFA9; border:1px solid; border-radius: 5px;}
 
 /*header bar styles */
-.header{display: flex; width: 100%; min-height: 50px;}
-  .headerImg{width: 50px; height: 50px; padding:0px 0px 10px 0px}
+.header{display: flex; width: 100%; min-height: 50px; position: absolute; bottom: 0px;}
+  .headerImg{width: 50px; height: 50px; padding:0px 0px 10px 0px; z-index: 2; background: white;}
 
 /*navigation bar styles*/
 .navBar{justify-content: space-between; width: 100%; min-height: 50px; overflow: hidden; background: #4281A4; display: flex; z-index: 2;}
@@ -33,8 +33,11 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 
 
 /**view styles***/
-mealList #mealList{display: flex; flex-wrap: wrap; justify-content: space-between;}
-  mealList .mealListItem{border: 1px solid; border-radius: 3px; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; width: 45%; background:#B2FFA9;}
+mealList #mealList{display: flex; flex-wrap: wrap; justify-content: center;}
+  mealList .mealListItem{border-bottom: 1px solid; border-radius: 3px; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; justify-content: space-between;width: 100%;}
+    mealList .mealItemBtns{min-width: 80px; display: flex; justify-content: space-between;}
+      mealList .mealItemDelete{width: 30px; height: 30px;}
+      mealList .mealItemEdit{width: 30px; height: 30px; transform: rotate(180deg);}
 mealList #explainationText div{margin: 5px 0 20px 0; font-size: 1.5em; padding:5px;}
 
 
@@ -49,7 +52,7 @@ mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
 
 
 mealPlan .header{justify-content: space-between;}
-mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 18px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#B2FFA9;}
+mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 18px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#4281A4;}
   mealPlan .mealDay.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important;}
   mealPlan .mealCheck{width: 28px; position: absolute; left: -12px; top: -12px; border: 1px solid; border-radius: 20px; background: white;}
   mealPlan .mealNumber{border-right: 1px solid; padding: 0 10px 0 10px;}
@@ -60,7 +63,7 @@ shoppingList .shoppingListMeal{margin: 10px; padding: 5px;}
   shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
   shoppingList .mealName{font-size: 1.5em;}
   shoppingList .mealRepeat{margin: 5px 0;}
-  shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 2px 0; display: list-item; list-style-type: disc; list-style-position: inside;}
+  shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 2px 0; display: list-item; list-style-type: disc; list-style-position: outside; margin-left: 20px;}
   shoppingList .mealIngredient.checked{text-decoration: line-through;}
 
 loadingScreen #loadingImg{position: absolute; width: 100%; height: 100%; z-index: 2; background: white;}

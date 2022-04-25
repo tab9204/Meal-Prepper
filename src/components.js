@@ -16,7 +16,7 @@ var lightBox = {
         m(".lightBoxButtons",[
           vnode.attrs.buttons.map((button)=>{
             return m(".lightBoxBtn",{onclick: ()=>{
-              button.click(vnode.attrs.vnode);
+              button.click();
             }}, button.text)
           })
         ])
