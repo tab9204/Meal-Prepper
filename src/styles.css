@@ -42,7 +42,7 @@ mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
   mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
   mealEdit .pageSection:first-child{max-height: 20px !important;}
     mealEdit .pageSection:first-child textarea{overflow-y: hidden !important;}
-  mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 100%; border-top: 1px solid; overflow-y: hidden;}
+  mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 100%; border-top: 1px solid; overflow-y: hidden; display: flex; flex-direction: column;}
   mealEdit .pageSection {margin: 5px;}
     mealEdit #toggle{width: 100%; display: flex; justify-content: space-evenly; margin-top: 5px;}
       mealEdit .toggleBtn{width: 105px; padding: 7px; margin: 3px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
