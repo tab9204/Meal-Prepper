@@ -34,9 +34,9 @@ var mealList = {
             }
             else{//if the meal array is empty
               return m("#explainationText",[
-                m("div", "You haven't added any meals yet!"),
-                m("div", "Use the bottom right icon to add some meals."),
-                m("div", "Once you have some meals added you can use the bottom left icon to create a meal plan."),
+                m("div", "Add some meals to get started!"),
+                m("div", "Use the top right button to add a meal."),
+                m("div", "Then use the top left button to create a meal plan."),
               ])
             }
           }))
@@ -57,17 +57,33 @@ var mealEdit = {
     return m("mealEdit#pageContainer",[
       m("#pageContent",[
         m(".pageSection",[
-          m("textarea#name",{placeholder: "Provide a name for this meal.", rows: 1, oninput: (e)=>{
+          m("input#name",{placeholder: "What is the name of this meal?", value: vnode.attrs.meal.name,  type: "text", oninput: (e)=>{
             views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
-          }},vnode.attrs.meal.name)
+          }})
         ]),
         m(".pageSection",[
-          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.", oninput: (e)=>{
+          m("#toggle",[
+            m("#toggleIngredients.toggleBtn.toggled",{onclick: (e)=>{
+              //prevent redraw as it will wipe all text from the fields
+              e.redraw = false;
+              //toggle this button, remove toggle from the other button, show the ingredients and hide the directions
+              e.currentTarget.classList.add("toggled");
+              document.getElementById("toggleDirections").classList.remove("toggled");
+              document.getElementById("ingredients").classList.remove("hidden");
+              document.getElementById("directions").classList.add("hidden");
+            }}, "Ingredients"),
+            m("#toggleDirections.toggleBtn",{onclick: (e)=>{
+              e.redraw = false;
+              e.currentTarget.classList.add("toggled");
+              document.getElementById("toggleIngredients").classList.remove("toggled");
+              document.getElementById("directions").classList.remove("hidden");
+              document.getElementById("ingredients").classList.add("hidden");
+            }}, "Directions")
+          ]),
+          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nAny ingredients placed here will be used when creating the meal plan shopping list.", oninput: (e)=>{
             views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
-          }},vnode.attrs.meal.ingredients)
-        ]),
-        m(".pageSection",[
-          m("textarea#directions",{placeholder: "Add cooking instructions for the meal here.", oninput: (e)=>{
+          }},vnode.attrs.meal.ingredients),
+          m("textarea#directions.hidden",{placeholder: "Add cooking instructions for the meal here.\n\nThis isn't required but is useful when cooking the meal.", oninput: (e)=>{
             views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
           }},vnode.attrs.meal.directions)
         ])
