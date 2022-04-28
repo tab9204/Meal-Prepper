@@ -4,90 +4,30 @@ import "../libraries/pouchdb-7.2.1.js";
 
 //navigating app views
 var navigate = {
+  //navigates to the meal list view
+  toMealList: async ()=>{
+    await views.mealList.initalize();
+    //route to the meal plan view passing along all the meals
+    m.route.set('/list');
+  },
   //navigates to the meal edit view
   //id => the id of the meal to display for editing
   toMealEdit: async (id)=>{
-    //the meal data the edit view needs to render
-    var meal_id, name, ingredients, directions, checked;
-    //boolean for if the text input should automatically focus on page render
-    var autoFocus;
-    //if the id is not undefined we are editing an existing meal
-    if(id !== undefined){
-      //get the meal data from the db
-      var meal = await database.get(database.meals,id);
-      //set the rendering vars to the meal data from the db
-      meal_id = id;
-      name = meal.name;
-      ingredients = meal.ingredients;
-      directions = meal.directions;
-      checked = meal.checked !== undefined ? meal.checked : [];
-      //since this is an existing meal we are editing the mobile keyboard should not automatically show
-      autoFocus = false;
-    }
-    //if the id is undefined then we are creating a brand new meal
-    else{
-      //generate a unique id for the new meal
-      var new_id = '' + Date.now();
-      //meal data to store in the db
-      //since its new the data should default to empty
-      //var data = {name: '', ingredients:'', directions:'', checked: []};
-      //add the new meal to the db
-      //await database.add(database.meals,new_id,data);
-      //rendering vars default to empty
-      meal_id = new_id;
-      name = '';
-      ingredients = '';
-      directions = '';
-      checked = []
-      //new meal so mobile keyboard should auto show
-      autoFocus = true;
-    }
+    await views.mealEdit.initalize(id);
     //route to the edit view passing the rendering vars
-    m.route.set('/edit', {meal:{id:meal_id, name:name, ingredients:ingredients, directions:directions, checked:checked}, autoFocus: autoFocus});
-  },
-  //navigates to the meal list view
-  toMealList: async ()=>{
-    //get an up to date list of meals from the meals db
-    var allMeals = await database.getAll(database.meals);
-    //sort the meals in order of newest to oldest
-    allMeals.sort((a,b)=>{return b.id - a.id;});
-    //route to the meal plan view passing along all the meals
-    m.route.set('/list', {meals: allMeals});
+    m.route.set('/edit');
   },
   //navigates to the meal plan view
   toMealPlan: async ()=>{
-    //array of objects needed to render the meal plan view
-    //each object is a meal consisting of:
-      //the name of the meal, the meal id, the id of the day in the meal plan db, and a checked boolean
-    var renderData = [];
-    //get all days in the meal plan
-    var mealPlan = await database.getAll(database.mealPlan);
-    //if the meal plan is not empty
-    if(mealPlan[0] !== ""){
-      //loop through all the days
-      for (var day of mealPlan) {
-        //get the name and id of the meal on each day of the plan
-        var meal = await database.get(database.meals,day.doc.meal_id);
-        var name = meal.name;
-        var meal_id = meal._id;
-        //add an object with the meal name, meal id, day id and checked boolan to the render data array
-        renderData.push({name: name, meal_id:meal_id, id: day.id, checked: day.doc.checked});
-      }
-    }
-    //uf the meal plan is empty return an empty array
-    else{
-      renderData = [""];
-    }
+    await views.mealPlan.initalize();
     //route to the mealPlan view passing the render data to the view
-    m.route.set('/plan',{plan: renderData});
+    m.route.set('/plan');
   },
   //navigates to the shopping list view
   toShoppingList: async ()=>{
-    //create the shopping list
-    var shoppingList = await views.shoppingList.createList();
-    if(shoppingList == undefined || shoppingList.length == 0){shoppingList = [""];}
+    await views.shoppingList.initalize();
     //route to the shopping list view
-    m.route.set('/shop',{list: shoppingList});
+    m.route.set('/shop');
   },
   toLoadingScreen: async()=>{
     //route to the loading screen view
@@ -138,12 +78,66 @@ var views = {
           text: "Cancel"
         }
       ]
+    },
+    allMeals: [],//array containg the meal data needed to render the view
+    initalize: async ()=>{//initalizes the view data
+      //get an up to date list of meals from the meals db
+      var meals = await database.getAll(database.meals);
+      //sort the meals in order of newest to oldest
+      meals.sort((a,b)=>{return b.id - a.id;});
+      //set the meal list variable
+      views.mealList.allMeals = meals;
+      m.redraw();
     }
   },
   //the mealEdit view
   mealEdit:{
     //reference to the setTimout function
     timeout: null,
+    //the meal data the view needs to render
+    meal: {
+      id:null,
+      name:null,
+      ingredients:null,
+      directions:null,
+      checked:null
+    },
+    //boolean for if the text input should automatically focus on page render
+    autoFocus:false,
+    //id => the id of the meal to display for editing
+    initalize: async (id)=>{
+      //if the id is not undefined we are editing an existing meal
+      if(id !== undefined){
+        //get the meal data from the db
+        var meal = await database.get(database.meals,id);
+        //set the rendering vars to the meal data from the db
+        views.mealEdit.meal.id = id;
+        views.mealEdit.meal.name = meal.name;
+        views.mealEdit.meal.ingredients = meal.ingredients;
+        views.mealEdit.meal.directions = meal.directions;
+        views.mealEdit.meal.checked = meal.checked !== undefined ? meal.checked : [];
+        //since this is an existing meal we are editing the mobile keyboard should not automatically show
+        views.mealEdit.autoFocus = false;
+      }
+      //if the id is undefined then we are creating a brand new meal
+      else{
+        //generate a unique id for the new meal
+        var new_id = '' + Date.now();
+        //meal data to store in the db
+        //since its new the data should default to empty
+        //var data = {name: '', ingredients:'', directions:'', checked: []};
+        //add the new meal to the db
+        //await database.add(database.meals,new_id,data);
+        //rendering vars default to empty
+        views.mealEdit.meal.id = new_id;
+        views.mealEdit.meal.name = '';
+        views.mealEdit.meal.ingredients = '';
+        views.mealEdit.meal.directions = '';
+        views.mealEdit.meal.checked = []
+        //new meal so mobile keyboard should auto show
+        views.mealEdit.autoFocus = true;
+      }
+    },
     //on input change
     //e => event data
     //id => id of the meal being edited
@@ -168,7 +162,7 @@ var views = {
         if(meal !== ""){
           await database.update(database.meals,id,data);
         }
-        //otherwise the meal doesnt exits and we should add it to the db
+        //otherwise the meal doesnt exit and we should add it to the db
         else if (meal == ""){
           await database.add(database.meals,id,data);
         }
@@ -232,12 +226,34 @@ var views = {
         },
       ]
     },
+    //meal plan data needed to render the view
+    plan: [],
+    initalize: async ()=>{
+      //empty the meal plan array
+      views.mealPlan.plan = [];
+      //get all days in the meal plan
+      var mealPlan = await database.getAll(database.mealPlan);
+      //loop through all the days
+      for (var day of mealPlan) {
+        //get the name and id of the meal on each day of the plan
+        var meal = await database.get(database.meals,day.doc.meal_id);
+        var name = meal.name;
+        var meal_id = meal._id;
+        //add an object with the meal name, meal id, day id and checked boolan to the meal plan array
+        views.mealPlan.plan.push({name: name, meal_id:meal_id, id: day.id, checked: day.doc.checked});
+      }
+    },
     //creates a meal plan by adding X number of entries to the mealPlan db
     //days => number of days and meals in the meal plan
     //added => counter to keep track of the number of meals added
     createPlan: async (days,added)=>{
       //get all the meals in the db
       var allMeals = await database.getAll(database.meals);
+      //if the there are no meals saved in the db create an empty array to use instead
+      if(allMeals.length <= 0){
+        //fill the allMeals array with empty strings for each day in the meal plan
+        allMeals = Array(days).fill("");
+      }
       //shuffle the order of the meals array
       utilities.shuffle(allMeals);
       //loop through each meal
@@ -304,15 +320,16 @@ var views = {
     }
   },
   shoppingList:{
-    //generates a list of ingredients based on the meals in the meal plan
-    createList: async ()=>{
+    //shopping list render data
+    list: [],
+    initalize: async ()=>{
       //holds all the shopping list data
       var shoppingList = [];
       //get the meals in the meal plan
       var mealPlan = await database.getAll(database.mealPlan);
       //if the meal plan is empty exit the function
-      if(mealPlan[0] == ""){return;}
-      //loop through the meal plan and cout up how many times each meal appears in the entire plan
+      if(mealPlan.length <= 0){return;}
+      //loop through the meal plan and count up how many times each meal appears in the entire plan
       const repeats = {};
       mealPlan.forEach((meal) => {
         repeats[meal.doc.meal_id] = (repeats[meal.doc.meal_id] || 0) + 1;
@@ -324,15 +341,14 @@ var views = {
         //shoppingList.push({meal_id:id,name:name:ingredients,checked:[]})
         //get the meal data for the meal of the day
         var meal = await database.get(database.meals,day.doc.meal_id);
-        //if the meal no longer exists in the db skip it
-        if(meal == ""){continue ;}
-        //if the meals checked array is undefined or empty we need to set the array to have an empty string
-        //we cannot pass an empty array to the view so we need to pass the array with something in it or else we get an error
-        var checked = meal.checked == undefined || meal.checked.length == 0 ? [""] : meal.checked;
+        //if the meal is not in the db skip it
+        if(meal == ""){continue;}
+        //if the meals checked array is undefined set it to an empty array
+        var checked = meal.checked == undefined ? [] : meal.checked;
         //convert the ingredients string into an array
         //filter out any blank strings as we want to ignore those
         var strToArry = meal.ingredients.split("\n").filter(ingredient => ingredient);
-        var ingredients = strToArry.length >= 1 ? strToArry : [""];
+        var ingredients = strToArry.length >= 1 ? strToArry : [];
         //object containing all the meal data needed to shop for this meal
         var addToList = {meal_id: meal._id, name: meal.name, ingredients: ingredients, checked: checked, repeat: repeats[meal._id]};
         //find if this list item has already been added to the shopping list
@@ -342,7 +358,8 @@ var views = {
           shoppingList.push(addToList);
         }
       }
-      return shoppingList;
+      //set the shopping list data
+      views.shoppingList.list = shoppingList;
     },
     //adds or removes an ingredient from the checkedIngredients array
     //e => element that was clicked

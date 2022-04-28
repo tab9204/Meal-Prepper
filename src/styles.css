@@ -41,17 +41,17 @@ mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
   mealEdit .header{justify-content: end;}
   mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
   mealEdit .pageSection:first-child{max-height: 20px !important;}
-    mealEdit .pageSection:first-child textarea{overflow-y: hidden !important;}
+    mealEdit .pageSection:first-child input {font-size: 1em;}
   mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 100%; border-top: 1px solid; overflow-y: hidden; display: flex; flex-direction: column;}
   mealEdit .pageSection {margin: 5px;}
     mealEdit #toggle{width: 100%; display: flex; justify-content: space-evenly; margin-top: 5px;}
-      mealEdit .toggleBtn{width: 105px; padding: 7px; margin: 3px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
+      mealEdit .toggleBtn{width: 105px; padding: 7px; margin: 5px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
       mealEdit .toggleBtn.toggled{background: #86CB92; box-shadow: none;}
     mealEdit textarea, mealEdit input{resize: none; width: 100%; height: 100%; padding: 5px 0; border:none; overflow-y: scroll; background: #faf9f6;}
     mealEdit textarea:focus, mealEdit input:focus{outline: none;}
 
 
-mealPlan #mealPlanMenu {display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; background: #4281A4; border: 1px solid; width: 65px; height: 140px; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 5px;}
+mealPlan #mealPlanMenu {display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; background: #86CB92; border: 1px solid; width: 65px; height: 140px; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 5px;}
   mealPlan .menuOpen{width: 50px; height: 50px;position: absolute; bottom: 0px;}
   mealPlan .menuIcon{width: 50px; height: 50px; padding:0px 5px 10px 0px; z-index: 2;}
 mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 15px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#86CB92; box-shadow: 0.25px 0.5px 0.5px black;}

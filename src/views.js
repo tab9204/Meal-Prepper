@@ -6,6 +6,10 @@ import {lightBox,loadingImg} from './components.js'
 
 //view that lists all meals that have been saved in the meals db
 var mealList = {
+  oninit: async (vnode)=>{
+    //await views.mealList.initalize();
+    //m.redraw();
+  },
   view: (vnode)=>{
     return m("mealList#pageContainer",[
       m(lightBox,{//delete the current meal
@@ -15,31 +19,26 @@ var mealList = {
       }),
       m("#pageContent",[
         m(".pageSection",[
-          m("#mealList",vnode.attrs.meals.map((meal)=>{
-            if(meal !== ""){//if the meal array is not empty
-              return m(".mealListItem",{ id: meal.id}, [
-                m(".mealItemName", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
-                m(".mealItemBtns",[
-                  m("img.mealItemDelete",{src: "../assets/trashCan.png", onclick: async ()=>{
-                    //set the meal id for the lightbox so we delete the correct meal
-                    views.mealList.lightBox.meal_id =  meal.id;
-                    //open the lightbox
-                    setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
-                  }}),
-                  m("img.mealItemEdit",{src: "../assets/navigate.png", onclick: async (e)=>{
-                      await navigate.toMealEdit(meal.id);
-                  }})
-                ])
+          m("#mealList",views.mealList.allMeals.length >= 1 ? views.mealList.allMeals.map((meal)=>{
+            return m(".mealListItem",{ id: meal.id}, [
+              m(".mealItemName", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
+              m(".mealItemBtns",[
+                m("img.mealItemDelete",{src: "../assets/trashCan.png", onclick: async ()=>{
+                  //set the meal id for the lightbox so we delete the correct meal
+                  views.mealList.lightBox.meal_id =  meal.id;
+                  //open the lightbox
+                  setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
+                }}),
+                m("img.mealItemEdit",{src: "../assets/navigate.png", onclick: async (e)=>{
+                    await navigate.toMealEdit(meal.id);
+                }})
               ])
-            }
-            else{//if the meal array is empty
-              return m("#explainationText",[
-                m("div", "Add some meals to get started!"),
-                m("div", "Use the top right button to add a meal."),
-                m("div", "Then use the top left button to create a meal plan."),
-              ])
-            }
-          }))
+            ])
+          }) : m("#explainationText",[
+            m("div", "Add some meals to get started!"),
+            m("div", "Use the top right button to add a meal."),
+            m("div", "Then use the top left button to create a meal plan.")
+          ]))
         ])
       ])
     ])
@@ -49,7 +48,7 @@ var mealList = {
 //view for editing a meal's data
 var mealEdit = {
   oncreate: (vnode)=>{
-    if(vnode.attrs.autoFocus){
+    if(views.mealEdit.autoFocus){
       document.getElementById("name").focus();
     }
   },
@@ -57,8 +56,8 @@ var mealEdit = {
     return m("mealEdit#pageContainer",[
       m("#pageContent",[
         m(".pageSection",[
-          m("input#name",{placeholder: "What is the name of this meal?", value: vnode.attrs.meal.name,  type: "text", oninput: (e)=>{
-            views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
+          m("input#name",{placeholder: "What is the name of this meal?", value: views.mealEdit.meal.name,  type: "text", oninput: (e)=>{
+            views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
           }})
         ]),
         m(".pageSection",[
@@ -81,11 +80,11 @@ var mealEdit = {
             }}, "Directions")
           ]),
           m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nAny ingredients placed here will be used when creating the meal plan shopping list.", oninput: (e)=>{
-            views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
-          }},vnode.attrs.meal.ingredients),
+            views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
+          }},views.mealEdit.meal.ingredients),
           m("textarea#directions.hidden",{placeholder: "Add cooking instructions for the meal here.\n\nThis isn't required but is useful when cooking the meal.", oninput: (e)=>{
-            views.mealEdit.onChange(e,vnode.attrs.meal.id,vnode.attrs.meal.checked);
-          }},vnode.attrs.meal.directions)
+            views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
+          }},views.mealEdit.meal.directions)
         ])
       ])
     ])
@@ -96,7 +95,7 @@ var mealEdit = {
 var mealPlan = {
   oncreate: (vnode)=>{
     //if there is no current meal plan open the meal plan selection lightbox
-    if(vnode.attrs.plan == ""){utilities.lightBox.open("mealPlanLightBox2");}
+    if(views.mealPlan.plan.length <= 0){utilities.lightBox.open("mealPlanLightBox2");}
   },
   view: (vnode)=>{
     return m("mealPlan#pageContainer",[
@@ -116,19 +115,13 @@ var mealPlan = {
         document.getElementById("mealPlanMenu").classList.add("hidden");
       }},[
         m(".pageSection",[
-          m("#mealPlanList",vnode.attrs.plan.map((day,i)=>{
-            if(day !== ""){//if the meal plan array is not empty
+          m("#mealPlanList",views.mealPlan.plan.map((day,i)=>{
             return m(".mealDay",{id: day.id, class: day.checked ? "checked" : "", meal_id: day.meal_id, onclick: (e)=>{
               views.mealPlan.checkOffDay(e,day.id,day.meal_id);
             }},[
-              /*m("img.mealCheck",{src:"../assets/x.png", onclick: async (e)=>{views.mealPlan.checkOffDay(e,day.id,day.meal_id);}}),*/
               m(".mealNumber", "Day " +  (i + 1)),
               m(".mealName", day.name)
             ])
-            }
-            else{//if the meal plan array is empty
-              return m("div","")
-            }
           }))
         ])
       ]),
@@ -154,29 +147,19 @@ var shoppingList = {
     return m("shoppingList#pageContainer",[
       m("#pageContent",[
         m(".pageSection",[
-          m("#shoppingList",vnode.attrs.list.map((item,i)=>{
-            if(item !== ""){//if the shopping list is not empty
-              return m(".shoppingListMeal",{item_id: item.meal_id, repeat: item.repeat},[
-                m(".nameContainer",[
-                  m(".mealName",item.name == "" ? "Nameless Meal" : item.name),
-                  m(".mealRepeat",item.repeat >= 2 ?  "x" + item.repeat : "")
-                ]),
-                item.ingredients.map((ingredient,i)=>{
-                  if(ingredient !== ""){
-                    return m(".mealIngredient",{class: item.checked.includes(ingredient) ? "checked" : "", onclick: async (e)=>{
-                      await views.shoppingList.checkOffIngredient(e,ingredient,item.meal_id);
-                    }},ingredient)
-                  }
-                  else{
-                    return m("div","No ingredients needed")
-                  }
-                })
-              ])
-            }
-            else{//if shopping list is empty
-              return m("div","Nothing to shop for!")
-            }
-          }))
+          m("#shoppingList",views.shoppingList.list.length >= 1 ? views.shoppingList.list.map((item,i)=>{
+            return m(".shoppingListMeal",{item_id: item.meal_id, repeat: item.repeat},[
+              m(".nameContainer",[
+                m(".mealName",item.name == "" ? "Nameless Meal" : item.name),
+                m(".mealRepeat",item.repeat >= 2 ?  "x" + item.repeat : "")
+              ]),
+              item.ingredients.length >= 1 ? item.ingredients.map((ingredient,i)=>{
+                return m(".mealIngredient",{class: item.checked.includes(ingredient) ? "checked" : "", onclick: async (e)=>{
+                  await views.shoppingList.checkOffIngredient(e,ingredient,item.meal_id);
+                }},ingredient)
+              }) : "No ingredients needed"
+            ])
+          }) : "Nothing to shop for")
         ])
       ])
     ])

@@ -21,9 +21,8 @@ var database = {
     var all;
     try{
       all = await db.allDocs({include_docs: true});
-      //if the db is empty return an array with an empty string
-      //we do this because an empty array cannot be passed to the view as data. The array needs something in it
-      if(all.rows.length <= 0){all.rows = [""];}
+      //if the db is empty return an empty array
+      if(all.rows.length <= 0){all.rows = [];}
     }
     catch(e){throw new Error(e);}
     return all.rows;
