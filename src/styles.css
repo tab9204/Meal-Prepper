@@ -52,7 +52,7 @@ mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
 
 
 mealPlan #mealPlanMenu {display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; background: #86CB92; border: 1px solid; width: 65px; height: 140px; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 5px;}
-  mealPlan .menu{width: 50px; height: 50px;position: absolute; bottom: 0px; left:0px;}
+  mealPlan .menu{width: 50px; height: 50px;position: sticky; bottom: 0px; left:0px;}
   mealPlan .menu.disabled{opacity: .5;}
   mealPlan .menuIcon{width: 50px; height: 50px; padding:0px 5px 10px 0px; z-index: 2;}
 mealPlan .btn{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 15px 0px; font-size: 1em; left: 50%; transform: translateX(-50%);}
