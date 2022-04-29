@@ -95,7 +95,11 @@ var mealEdit = {
 var mealPlan = {
   oncreate: (vnode)=>{
     //if there is no current meal plan open the meal plan selection lightbox
-    if(views.mealPlan.plan.length <= 0){utilities.lightBox.open("mealPlanLightBox2");}
+    if(views.mealPlan.planData.length <= 0){
+      //hide the main section and show the first selection section
+      document.querySelector("#main.pageSection").classList.add("hidden");
+      document.querySelector("#select.pageSection").classList.remove("hidden");
+    }
   },
   view: (vnode)=>{
     return m("mealPlan#pageContainer",[
@@ -114,20 +118,35 @@ var mealPlan = {
       m("#pageContent",{onmousedown: ()=>{
         document.getElementById("mealPlanMenu").classList.add("hidden");
       }},[
-        m(".pageSection",[
-          m("#mealPlanList",views.mealPlan.plan.map((day,i)=>{
-            return m(".mealDay",{id: day.id, class: day.checked ? "checked" : "", meal_id: day.meal_id, onclick: (e)=>{
+        m("#main.pageSection",[
+          m("#mealPlanList",views.mealPlan.planData.map((day,i)=>{
+            return m(".btn",{id: day.id, class: day.checked ? "checked" : "", meal_id: day.meal_id, onclick: (e)=>{
               views.mealPlan.checkOffDay(e,day.id,day.meal_id);
             }},[
               m(".mealNumber", "Day " +  (i + 1)),
               m(".mealName", day.name)
             ])
-          }))
-        ])
+          })),
+          m("img.menu",{src:"../assets/menu.png", onclick: ()=>{
+            document.getElementById("mealPlanMenu").classList.remove("hidden");
+          }})
+        ]),
+        m("#select.pageSection.hidden", views.mealPlan.savedMeals.length >= 1 ? [
+          m("div","Tap on a meal to include it in your meal plan"),
+          views.mealPlan.savedMeals.map((meal)=>{
+            return m(".btn", {meal_id: meal.id, onclick: (e)=>{
+              views.mealPlan.selectMeal(e,meal.id);
+            }},[
+              m("div",meal.doc.name),
+              m(".img","")
+            ])
+          }),
+          m("img.menu.disabled",{src:"../assets/check.png", onclick: ()=>{
+            //use the selected meals to create the meal plan
+            views.mealPlan.createPlan(views.mealPlan.selectedMeals);
+          }})
+        ] : "You must add meals before you can create a meal plan")
       ]),
-      m("img.menuOpen",{src:"../assets/menu.png", onclick: ()=>{
-        document.getElementById("mealPlanMenu").classList.remove("hidden");
-      }}),
       m("#mealPlanMenu.hidden.scaleUp",[
         m("img#deleteMealPlan.menuIcon",{src: "../assets/trashCan.png", onclick: async ()=>{
           utilities.lightBox.open("mealPlanLightbox1");

@@ -180,7 +180,12 @@ var views = {
             await views.mealPlan.deletePlan();//delete the meal plan
             //open and close the correct lightboxes
             utilities.lightBox.close("mealPlanLightbox1");
-            utilities.lightBox.open("mealPlanLightBox2");
+            //hide the main section and show the first selection section
+            document.querySelector("#main.pageSection").classList.add("hidden");
+            document.querySelector("#select.pageSection").classList.remove("hidden");
+            //make sure the menu popup is closed
+            document.getElementById("mealPlanMenu").classList.add("hidden");
+          //  utilities.lightBox.open("mealPlanLightBox2");
           },
           text: "Delete"
         },
@@ -226,13 +231,18 @@ var views = {
         },
       ]
     },
-    //meal plan data needed to render the view
-    plan: [],
+    planData: [],//meal plan data needed to render the view
+    savedMeals: [],//list of all saved meals available to use in the meal plan
+    selectedMeals: [],//list of meals selected to be added to the meal plan
     initalize: async ()=>{
-      //empty the meal plan array
-      views.mealPlan.plan = [];
+      //empty the plan data, saved meals, and selected meals arrays
+      views.mealPlan.planData = [];
+      views.mealPlan.savedMeals = [];
+      views.mealPlan.selectedMeals = [];
       //get all days in the meal plan
       var mealPlan = await database.getAll(database.mealPlan);
+      //get all the saved meals
+      var allMeals = await database.getAll(database.meals);
       //loop through all the days
       for (var day of mealPlan) {
         //get the name and id of the meal on each day of the plan
@@ -240,48 +250,31 @@ var views = {
         var name = meal.name;
         var meal_id = meal._id;
         //add an object with the meal name, meal id, day id and checked boolan to the meal plan array
-        views.mealPlan.plan.push({name: name, meal_id:meal_id, id: day.id, checked: day.doc.checked});
+        views.mealPlan.planData.push({name: name, meal_id:meal_id, id: day.id, checked: day.doc.checked});
+      }
+      //loop through all the meals
+      for (var meal of allMeals) {
+        views.mealPlan.savedMeals.push(meal);
       }
     },
-    //creates a meal plan by adding X number of entries to the mealPlan db
-    //days => number of days and meals in the meal plan
-    //added => counter to keep track of the number of meals added
-    createPlan: async (days,added)=>{
-      //get all the meals in the db
-      var allMeals = await database.getAll(database.meals);
-      //if the there are no meals saved in the db create an empty array to use instead
-      if(allMeals.length <= 0){
-        //fill the allMeals array with empty strings for each day in the meal plan
-        allMeals = Array(days).fill("");
-      }
-      //shuffle the order of the meals array
-      utilities.shuffle(allMeals);
+    //creates a meal plan by added meals to the meal plan db
+    //meals => the ids of the meals selected to be added to the meal plan
+    createPlan: async (meals)=>{
+      //shuffle the order of the meals
+      utilities.shuffle(meals);
+      //the id of the new entry in the meal plan db
+      var dayId = 0;
       //loop through each meal
-      for(var i = 0; i < allMeals.length; i++){
-        //get a meal from the meals array
-        var selectedMeal = allMeals[i];
-        //build the object containing the data needed for the new entry in the meal plan db
-        var data = {meal_id: selectedMeal.id, checked: false};
+      for (var meal of meals) {
+        //build the object containing the data needed for the new day in the meal plan
+        var day = {meal_id: meal, checked: false};
         //add a new entry to the meal plan db
-        await database.add(database.mealPlan,added + "",data);
-        //increment the added counter
-        added++;
-        //if the number of meals added is equal to the number of days in the meal plan
-        if(added == days){
-          //we have added enough meals so we can break out of the loop
-          break;
-        }
+        await database.add(database.mealPlan,dayId + "",day);
+        //increment the day id
+        dayId++;
       }
-      //if the number of meals added is less then the number of days in the meal plan
-      if(added < days){
-        //we will need to add more so call createPlan again
-        await views.mealPlan.createPlan(days,added);
-      }
-      //if we have added enough meals for each day in the meal plan
-      else if(added == days){
-        //navigate to the meal plan view. This will re-render the view with the most up to date meal plan
-        navigate.toLoadingScreen();
-      }
+      //navigate to the meal plan view. This will re-render the view with the most up to date meal plan
+      navigate.toLoadingScreen();
     },
     //deletes the current meal plan from the db
     deletePlan: async ()=>{
@@ -317,6 +310,31 @@ var views = {
       var update = {meal_id: meal_id, checked: checked};
       //update the entry in the db
       await database.update(database.mealPlan,day_id,update);
+    },
+    //selects a meal for the meal plan
+    //e => element the triggered the the event
+    // id => id of the meal being selected
+    selectMeal: async(e,id)=>{
+      //toggle the checked class
+      e.currentTarget.classList.toggle("checked");
+      //if the meal is now checked att it to the selected array
+      if(e.currentTarget.classList.contains("checked")){
+        views.mealPlan.selectedMeals.push(id);
+      }
+      //the meal is being deselected so remove it from the array
+      else{
+        views.mealPlan.selectedMeals = views.mealPlan.selectedMeals.filter((i)=>{
+          return i !== id;
+        })
+      }
+      //check if the create meal plan button should be enabled
+      //if there is at least 1 item in the selected array enable the button
+      if(views.mealPlan.selectedMeals.length >= 1){
+        document.querySelector("#select .menu").classList.remove("disabled");
+      }
+      else{
+        document.querySelector("#select .menu").classList.add("disabled");
+      }
     }
   },
   shoppingList:{

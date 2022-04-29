@@ -25,7 +25,7 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
   .navBtnContainer{display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 25px; position: relative;}
   .btnBackground{width: 10px; height: 10px; background: white; transform-origin: center; border-radius: 20px; position: absolute;}
   .btnImage {position: absolute; width: 50px; height: 50px; padding: 3px;}
-    #toMealEdit {transform: rotate(180deg);}
+    #toMealEdit {width: 45px !important; height: 45px !important;}
 
 
 /**view styles***/
@@ -52,12 +52,18 @@ mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
 
 
 mealPlan #mealPlanMenu {display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; background: #86CB92; border: 1px solid; width: 65px; height: 140px; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 5px;}
-  mealPlan .menuOpen{width: 50px; height: 50px;position: absolute; bottom: 0px;}
+  mealPlan .menu{width: 50px; height: 50px;position: absolute; bottom: 0px; left:0px;}
+  mealPlan .menu.disabled{opacity: .5;}
   mealPlan .menuIcon{width: 50px; height: 50px; padding:0px 5px 10px 0px; z-index: 2;}
-mealPlan .mealDay{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 15px 0px; font-size: 1em; left: 50%; transform: translateX(-50%); background:#86CB92; box-shadow: 0.25px 0.5px 0.5px black;}
-  mealPlan .mealDay.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important; box-shadow: none;}
-  mealPlan .mealCheck{width: 28px; position: absolute; left: -12px; top: -12px; border: 1px solid; border-radius: 20px; background: white;}
+mealPlan .btn{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 15px 0px; font-size: 1em; left: 50%; transform: translateX(-50%);}
+  mealPlan #main .btn{background:#86CB92; box-shadow: 0.25px 0.5px 0.5px black;}
+    mealPlan #main .btn.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important; box-shadow: none;}
+  mealPlan #select .btn{background:lightgrey; justify-content: space-between; align-items: center; box-shadow: 0.25px 0.5px 0.5px black;}
+    mealPlan #select .btn .img{width: 30px; height: 30px; background-image: url("../assets/plus.png"); background-size: contain;}
+    mealPlan #select .btn.checked{color: black; background: #86CB92!important;}
+    mealPlan #select .btn.checked .img{background-image: none;}
   mealPlan .mealNumber{border-right: 1px solid; padding: 0 10px 0 10px;}
+    mealPlan #main .btn.checked .mealName{text-decoration: line-through;}
   mealPlan .mealName{margin-left: 20px;}
 
 shoppingList .shoppingListMeal{margin: 10px; padding: 5px;}
