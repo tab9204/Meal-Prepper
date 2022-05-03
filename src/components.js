@@ -67,7 +67,7 @@ var navBar = {
             //add the pulse animation
             navigate.addPulse(e);
             //navigate to the meal edit view
-            await navigate.toMealEdit(undefined);
+            await navigate.toMealOptions();
           }
         })
       ])
@@ -75,6 +75,21 @@ var navBar = {
   }
 }
 
+//off screen loading icon that can be pulled into view to reload or do some other action
+var pullToReload ={
+  oncreate: (vnode)=>{
+    var touch = document.querySelector(vnode.attrs.touch);
+    var icon = document.querySelector(vnode.attrs.icon);
+    //initalize the touch events for the pull to reload
+    utilities.initPullToReload(touch,icon,vnode.attrs.length);
+  },
+  view: (vnode)=>{
+    return m(".reload",[
+      m("img",{src:"./assets/loading.gif"})
+    ])
+  }
+}
 
 
-export{lightBox,loadingImg,navBar};
+
+export{lightBox,loadingImg,navBar,pullToReload};

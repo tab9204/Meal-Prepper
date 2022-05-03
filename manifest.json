@@ -2,9 +2,20 @@
   "short_name": "Bottom Text",
   "name": "Bottom Text",
   "icons": [
-
+    {
+      "src": "./assets/chicken_192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/chicken_512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
   ],
-  "background_color": "#4281A4",
+  "background_color": "#ffffff",
   "theme_color": "#4281A4",
   "start_url": "/",
   "display": "standalone",

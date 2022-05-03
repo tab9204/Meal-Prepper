@@ -1,17 +1,20 @@
 /*General styles*/
 html{min-height: 100vh; width: 100%;}
 body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: contain; overflow: hidden; background: #E8EAEE;}
-.hidden{display:none !important;}
+.hidden{display: none !important;}
+.invisible{height: 0 !important; overflow: hidden !important; }
 .disabled{pointer-events: none !important;}
 ::-webkit-scrollbar {width: 0px;}
 .navBtn{width: 50px; height: 50px;}
 
+/*app structure styles*/
 #appRoot{height: 100%;display: flex; flex-direction: column; box-sizing: border-box; padding-top: 50px;}
   #pageRoot{height: 100%}
     #pageContainer{height: 100%; display: flex; flex-direction: column; background: #faf9f6; width: 100%;}
       #pageContent{padding: 8px; overflow-y: scroll; max-width: 640px; position: relative; left: 50%; transform: translateX(-50%); height: 100%;}
   #navRoot{display: flex; margin-top: -50px;}
 
+/*lightbox styles*/
 .lightBoxContainer.closed{display: none !important;}
 .lightBoxContainer.open{display: block !important;}
   .lightBoxBackground{position: absolute; background: black; z-index: 3; opacity: .6; width: 100%; height: 100%;}
@@ -27,53 +30,93 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
   .btnImage {position: absolute; width: 50px; height: 50px; padding: 3px;}
     #toMealEdit {width: 45px !important; height: 45px !important;}
 
+/*pull to reload styles*/
+.reload{position: absolute; background: #faf9f6; border: 1px solid; border-radius: 40px; bottom: -42px; left: 50%; transform: translateX(-50%);}
+  .reload img{width: 40px;}
+
+/*button styles*/
+/*check button*/
+.checkBtn{display: flex; border: 1px solid; border-radius: 6px; padding: 10px; margin: 15px 0px; font-size: 1em; align-items: center; box-shadow: 0.5px 1px 1px black;}
+.checkBtn.checked{box-shadow: none;}
+  .checkBtn img{ width: 20px; height: 20px; margin-left: 7px;}
+/*toggle button*/
+.toggle{display: flex; justify-content: space-evenly;}
+  .toggleBtn{padding: 7px; margin: 5px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
+    .toggleBtn.toggled{box-shadow: none;}
+/*go button*/
+.goBtnList{display: flex; flex-wrap: wrap; justify-content: center;}
+  .goBtn{border-bottom: 1px solid; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; justify-content: space-between; width: 100%;}
+    .goBtn .goIcons{min-width: 80px; display: flex; margin-left: 7px;}
+      .goBtn .goIcons .icon{width: 30px; height: 30px;}
+/*menu button*/
+.menuBtn{ width: 40px; position: absolute; bottom: 0px; left: 0px;}
+.menuBtn.disabled{opacity: .5;}
+.menu{display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; background: white; border: 1px solid; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 5px;}
+  .menu .menuIcon{width: 50px; padding: 0px 5px 10px 0px; z-index: 2; margin: 3px;}
 
 /**view styles***/
 mealList #mealList{display: flex; flex-wrap: wrap; justify-content: center;}
   mealList .mealListItem{border-bottom: 1px solid; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; justify-content: space-between;width: 100%;}
-    mealList .mealItemBtns{min-width: 80px; display: flex; justify-content: space-between;}
-      mealList .mealItemDelete{width: 30px; height: 30px;}
-      mealList .mealItemEdit{width: 30px; height: 30px; transform: rotate(180deg);}
+    mealList .goIcons{justify-content: space-between;}
+      mealList .goIcons .icon:nth-child(2){transform: rotate(180deg);}
 mealList #explainationText div{margin: 5px 0 20px 0; font-size: 1.5em; padding:5px;}
+
+/*mealOptions .pageSection{position: relative; transform: translate(-50%,-50%); left: 50%; top: 50%; display: flex; flex-direction: column; align-items: center;}*/
+mealOptions .pageSection{height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;}
+  mealOptions .pageSection .checkBtn{background: #86CB92; width: 80%; margin: 10px 0 !important; text-align: center;}
+    mealOptions .pageSection .checkBtn div{width: 100%;}
+
+mealSelect #pageContent{padding: 0px !important;}
+  mealSelect .recipe{padding-bottom: 5px; border-bottom: 1px solid;}
+    mealSelect .recipe img{width: 100%;}
+    mealSelect .recipe .recipeTitle{padding: 8px; font-size: 1.2em;}
+    mealSelect .recipe .recipeInfo .info{padding: 8px 10px;}
+      mealSelect .recipe .recipeInfo .info div{margin:6px 0;}
+      mealSelect .recipe .recipeInfo .recipeDirections div{display: list-item; list-style-type: decimal; margin-left: 20px;}
+    mealSelect .toggle{margin-top: 5px;}
+      mealSelect .toggleBtn{width: 105px;}
+      mealSelect .toggleBtn.toggled{background: #86CB92;}
+    mealSelect .checkBtn{background: #86CB92; width: 80%; left: 50%; transform: translate(-50%); position: relative; justify-content: center;}
+    mealSelect .checkBtn.checked{color: grey; border: 1px solid grey !important; background: lightgrey;}
 
 
 mealEdit#pageContainer{display: flex; flex-direction: column; height: 100%;}
-  mealEdit .header{justify-content: end;}
-  mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
-  mealEdit .pageSection:first-child{max-height: 20px !important;}
-    mealEdit .pageSection:first-child input {font-size: 1em;}
-  mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 100%; border-top: 1px solid; overflow-y: hidden; display: flex; flex-direction: column;}
-  mealEdit .pageSection {margin: 5px;}
-    mealEdit #toggle{width: 100%; display: flex; justify-content: space-evenly; margin-top: 5px;}
-      mealEdit .toggleBtn{width: 105px; padding: 7px; margin: 5px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
-      mealEdit .toggleBtn.toggled{background: #86CB92; box-shadow: none;}
-    mealEdit textarea, mealEdit input{resize: none; width: 100%; height: 100%; padding: 5px 0; border:none; overflow-y: scroll; background: #faf9f6;}
-    mealEdit textarea:focus, mealEdit input:focus{outline: none;}
+mealEdit #pageContent{display: flex; flex-direction: column; justify-content: space-evenly; height: 100%;}
+mealEdit .pageSection:nth-child(1) {border-bottom: 1px solid;}
+mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 100%; overflow-y: hidden; display: flex; flex-direction: column;}
+mealEdit .pageSection {margin: 5px;}
+  mealEdit #toggle{width: 100%; display: flex; justify-content: space-evenly; margin-top: 5px;}
+    mealEdit .toggleBtn{width: 105px; padding: 7px; margin: 5px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
+    mealEdit .toggleBtn.toggled{background: #86CB92; box-shadow: none;}
+  mealEdit .pageSection #name {font-size: 1.2em;}
+  mealEdit textarea, mealEdit input{resize: none; width: 100%; height: 100%; padding: 5px 0; border:none; overflow-y: scroll; background: #faf9f6;}
+  mealEdit textarea:focus, mealEdit input:focus{outline: none;}
 
 
-mealPlan #mealPlanMenu {display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; background: #86CB92; border: 1px solid; width: 65px; height: 140px; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 5px;}
-  mealPlan .menu{width: 50px; height: 50px;position: sticky; bottom: 0px; left:0px;}
-  mealPlan .menu.disabled{opacity: .5;}
-  mealPlan .menuIcon{width: 50px; height: 50px; padding:0px 5px 10px 0px; z-index: 2;}
-mealPlan .btn{position: relative; display: flex; border: 1px solid; border-radius: 6px; padding: 10px; width: 65%; margin: 15px 0px; font-size: 1em; left: 50%; transform: translateX(-50%);}
-  mealPlan #main .btn{background:#86CB92; box-shadow: 0.25px 0.5px 0.5px black;}
-    mealPlan #main .btn.checked{color: grey !important; border: 1px solid grey !important; background: lightgrey!important; box-shadow: none;}
-  mealPlan #select .btn{background:lightgrey; justify-content: space-between; align-items: center; box-shadow: 0.25px 0.5px 0.5px black;}
-    mealPlan #select .btn .img{width: 30px; height: 30px; background-image: url("../assets/plus.png"); background-size: contain;}
-    mealPlan #select .btn.checked{color: black; background: #86CB92!important;}
-    mealPlan #select .btn.checked .img{background-image: none;}
-  mealPlan .mealNumber{border-right: 1px solid; padding: 0 10px 0 10px;}
-    mealPlan #main .btn.checked .mealName{text-decoration: line-through;}
-  mealPlan .mealName{margin-left: 20px;}
+mealPlan #pageContent{overflow-y: visible !important;}
+  mealPlan .pageSection {display: flex; flex-direction: column; height: 100%;}
+    mealPlan .pageSection #selectList, mealPlan .pageSection #mealPlanList{overflow: scroll;}
+  mealPlan .menu {background: #86CB92;}
+  mealPlan .checkBtn{position: relative;left: 50%; transform: translateX(-50%); width: 65%;}
+    mealPlan #main .checkBtn{background: #86CB92;}
+      mealPlan #main .checkBtn div:nth-child(1){border-right: 1px solid; padding: 0 10px 0 10px; min-width:50px;}
+      mealPlan #main .checkBtn div:nth-child(2){margin-left: 20px;}
+      mealPlan #main .checkBtn.checked{color: grey; border: 1px solid grey !important; background: lightgrey;}
+    mealPlan #select .checkBtn{background:lightgrey; justify-content: space-between;}
+      mealPlan #select .checkBtn div{width:85%;}
+      mealPlan #select .checkBtn .img{background-image: url("../assets/plus.png"); background-size: contain;}
+      mealPlan #select .checkBtn.checked{color: black; background: #86CB92;}
+      mealPlan #select .checkBtn.checked .img{background-image: none;}
+
 
 shoppingList .shoppingListMeal{margin: 10px; padding: 5px;}
   shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
-  shoppingList .mealName{font-size: 1.5em;}
+  shoppingList .mealName{font-size: 1.4em;}
   shoppingList .mealRepeat{margin: 5px 0;}
   shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 2px 0; display: list-item; list-style-type: disc; list-style-position: outside; margin-left: 20px;}
   shoppingList .mealIngredient.checked{text-decoration: line-through;}
 
-loadingScreen #loadingImg{position: absolute; width: 100%; height: 100%; z-index: 2; background: white;}
+loadingScreen #loadingImg{position: absolute; width: 100%; height: 100%; z-index: 2; background: #faf9f6;}
 loadingScreen #loadingImg img{position: relative; left: 50%; top: 50%; transform: translate(-50%,-50%);}
 loadingScreen #toMealPlan{pointer-events: none !important;}
 loadingScreen #toMealList{pointer-events: none !important;}
@@ -118,6 +161,17 @@ loadingScreen #toMealEdit{pointer-events: none !important;}
   0% {transform: scale(0); opacity: .5;}
   50% {transform: scale(10);}
   100% {transform: scale(10); opacity: 0;}
+}
+
+.fadeIn{animation: fadeIn 0.5s; animation-iteration-count: 1; animation-fill-mode: forwards;}
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+.slideDown{animation: slideDown 0.5s; animation-fill-mode: forwards;}
+@keyframes slideDown {
+  to {bottom: -42px;}
 }
 
 

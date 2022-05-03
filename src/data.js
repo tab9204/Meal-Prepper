@@ -29,9 +29,19 @@ var navigate = {
     //route to the shopping list view
     m.route.set('/shop');
   },
-  toLoadingScreen: async()=>{
+  //navigates to the loading screen view
+  //load => string that specifies what what steps to take during loading and what page to route to after the loading is complete
+  toLoadingScreen: async(load)=>{
     //route to the loading screen view
-    m.route.set('/loading');
+    m.route.set('/load',{load:load});
+  },
+  toMealOptions: async()=>{
+    //route to the meal options screen view
+    m.route.set('/options');
+  },
+  toMealSelect: async()=>{
+    //route to the meal select screen view
+    m.route.set('/select');
   },
   //adds a pulse animation to a navigation button on click
   //e => element that triggered the click event
@@ -90,7 +100,6 @@ var views = {
       m.redraw();
     }
   },
-  //the mealEdit view
   mealEdit:{
     //reference to the setTimout function
     timeout: null,
@@ -123,11 +132,6 @@ var views = {
       else{
         //generate a unique id for the new meal
         var new_id = '' + Date.now();
-        //meal data to store in the db
-        //since its new the data should default to empty
-        //var data = {name: '', ingredients:'', directions:'', checked: []};
-        //add the new meal to the db
-        //await database.add(database.meals,new_id,data);
         //rendering vars default to empty
         views.mealEdit.meal.id = new_id;
         views.mealEdit.meal.name = '';
@@ -169,66 +173,103 @@ var views = {
       }, 500);
     }
   },
-  // the mealPlan view
+  mealSelect: {
+    //array of recipes returned by a getRecipes request
+    recipes: [],
+    getRecipes: async ()=>{
+      try{
+        //make a request to the server for some recipes
+        var request = await fetch("/getRecipes", {method: 'GET'});
+        //parse the response as json
+        var recipeJSON = await request.json();
+        //loop through all the recipes in the json
+        for(var recipe of recipeJSON.results){
+          //object to hold the recipe data we want to save
+          var data = {
+            name:null,
+            ingredients:[],
+            directions:[],
+            image:null
+          };
+          //add the title
+          data.name = recipe.title;
+          //check that the ingredients and directions exist, if not we can skip the recipe
+          if(recipe.analyzedInstructions[0] == undefined || recipe.extendedIngredients == undefined){continue;}
+          //loop though the ingredients and add each to the data object
+          for(var ingredient of recipe.extendedIngredients){
+            data.ingredients.push(ingredient.original);
+          }
+          //do the same for the directions
+          for(var direction of recipe.analyzedInstructions[0].steps){
+            data.directions.push(direction.step);
+          }
+          //fetch the image from the provided image url
+          var image = await fetch(recipe.image, {method: 'GET'});
+          //convert the image to a blob
+          var blob = await image.blob();
+          //convert the blob to an image url
+          var imageUrl = URL.createObjectURL(blob);
+          //finally add the url to the data object
+          data.image = imageUrl;
+          //add the data object to the recipes array
+          views.mealSelect.recipes.push(data);
+        }
+      }
+      catch(e){
+        console.log(e);
+      }
+    },
+    //selects a recipe and adds it to the meals db
+    //e => the click event that triggered the function
+    //index => the position of the recipe in the recipes array
+    selectRecipe: async (e,index)=>{
+      //add the checked and disabled classes to the button that was clicked on
+      e.currentTarget.classList.add("checked", "disabled");
+      //get the recipe data from the recipes array
+      var recipe = views.mealSelect.recipes[index];
+      //convert the ingredients and directions arrays into strings
+      var ingredientString = "";
+      var directionString = "";
+      for(var ingredient of recipe.ingredients){
+        ingredientString += ingredient + "\n";
+      }
+      for(var direction of recipe.directions){
+        directionString += direction + "\n";
+      }
+      //create an id for the new entry
+      var id = '' + Date.now();
+      //object caontaining all the data needed for a new meal entry in the db
+      var data = {name: recipe.name, ingredients: ingredientString, directions: directionString, checked: []};
+      await database.add(database.meals,id,data);
+    }
+  },
   mealPlan:{
     lightBox1: {
-      id: "mealPlanLightbox1",
+      id: "mealPlanLightbox",
       text: "Delete this meal plan and start over with a new one?",
       buttons: [
         {
           click: async (vnode)=>{
             await views.mealPlan.deletePlan();//delete the meal plan
-            //open and close the correct lightboxes
-            utilities.lightBox.close("mealPlanLightbox1");
+            //close the lightboxes
+            utilities.lightBox.close("mealPlanLightbox");
             //hide the main section and show the first selection section
             document.querySelector("#main.pageSection").classList.add("hidden");
             document.querySelector("#select.pageSection").classList.remove("hidden");
             //make sure the menu popup is closed
-            document.getElementById("mealPlanMenu").classList.add("hidden");
-          //  utilities.lightBox.open("mealPlanLightBox2");
+            document.getElementsByClassName("menu")[0].classList.add("hidden");
+            //switch the menu buttons
+            document.getElementById("mainMenu").classList.add("hidden");
+            document.getElementById("selectMenu").classList.add("hidden");
           },
           text: "Delete"
         },
         {
           click: (vnode) =>{
-            utilities.lightBox.close("mealPlanLightbox1");
+            utilities.lightBox.close("mealPlanLightbox");
           },
           text: "Cancel"
         }
-      ]
-    },
-    lightBox2: {
-      id: "mealPlanLightBox2",
-      text: "How many days would you like to meal prep for?",
-      buttons: [
-        {
-          click: async (vnode)=>{
-            await views.mealPlan.createPlan(3,0);
-            utilities.lightBox.close("mealPlanLightBox2");
-          },
-          text: "3 Days"
-        },
-        {
-          click: async (vnode)=>{
-            await views.mealPlan.createPlan(5,0);
-            utilities.lightBox.close("mealPlanLightBox2");
-          },
-          text: "5 Days"
-        },
-        {
-          click: async (vnode)=>{
-            await views.mealPlan.createPlan(7,0);
-            utilities.lightBox.close("mealPlanLightBox2");
-          },
-          text: "7 Days"
-        },
-        {
-          click: async (vnode)=>{
-            await views.mealPlan.createPlan(14,0);
-            utilities.lightBox.close("mealPlanLightBox2");
-          },
-          text: "14 Days"
-        },
       ]
     },
     planData: [],//meal plan data needed to render the view
@@ -274,7 +315,7 @@ var views = {
         dayId++;
       }
       //navigate to the meal plan view. This will re-render the view with the most up to date meal plan
-      navigate.toLoadingScreen();
+      navigate.toLoadingScreen("plan");
     },
     //deletes the current meal plan from the db
     deletePlan: async ()=>{
@@ -330,10 +371,10 @@ var views = {
       //check if the create meal plan button should be enabled
       //if there is at least 1 item in the selected array enable the button
       if(views.mealPlan.selectedMeals.length >= 1){
-        document.querySelector("#select .menu").classList.remove("disabled");
+        document.querySelector("#selectMenu").classList.remove("hidden");
       }
       else{
-        document.querySelector("#select .menu").classList.add("disabled");
+        document.querySelector("#selectMenu").classList.add("hidden");
       }
     }
   },
@@ -445,12 +486,79 @@ const utilities ={
       catch(e){console.log("No lightbox on this view");}
     }
   },
+  //functions for the navigation bar
+  navBar: {
+    //disables user events on the nav bar
+    disable: ()=>{
+      document.querySelectorAll("#toMealPlan, #toMealList, #toMealEdit").forEach((element) => {
+        element.classList.add("disabled");
+      });
+    },
+    //enables user events on the nav bar
+    enable: ()=>{
+      document.querySelectorAll("#toMealPlan, #toMealList, #toMealEdit").forEach((element) => {
+        element.classList.remove("disabled");
+      });
+    }
+  },
   //returns a promise to delay the remove of an element from the dom
   //used when navigating between app pages
   timedDelay: (time)=>{
     //wait 300 ms to allow time for the nav animation to finish
-    return new Promise((resolve) => {setTimeout(() => {resolve()}, 750)});
+    return new Promise((resolve) => {setTimeout(() => {resolve()}, time)});
   },
+  //initalizes the touch move events needed for the pull to reload component
+  //touch => the screen element that is listening to the touch events
+  //icon => the html of the loading icon on the page
+  //length => number of px the loading icon must be pulled to start the reload
+  initPullToReload: (touch,icon,length)=>{
+    //the Y postion of the user's finger when dragging starts
+   var startY;
+   //The starting Y position of the user's finger when the page container is at the top of its scroll
+   var topStartY = 0;
+   //how many px the user has swiped down since reaching the top of the container
+   var deltaY = 0;
+   //add the touch start, touch move, and touch end event listeners to the touch element
+   touch.addEventListener('touchstart', (e)=>{
+      //set the startY
+      startY = e.touches[0].pageY;
+      //set the loading icon back to its default position
+      icon.style.bottom = "-42px";
+      //remove the slide up animation from the icon
+      icon.classList.remove("slideDown");
+    }, {passive: true});
+
+    touch.addEventListener('touchmove', (e) => {
+      //y position of the user's finger during the touch drag
+      var y = e.touches[0].pageY;
+      //if the page container is at the bottom of its scroll and the user is swiping up
+      if (Math.ceil(touch.offsetHeight + touch.scrollTop) >= touch.scrollHeight && y < startY) {
+        //set the overflow to hidden so that the page cannot scroll during the swipe
+        touch.style.overflowY = "hidden";
+        //set the topStartY if it has not already been set
+        if(topStartY == 0){topStartY = y;}
+        //calculate how far up the user has dragged their finger since getting to the end of the scroll
+        deltaY = y - topStartY;
+        //if the delta y is less then the buffer amount move the loading icon by the delta amount
+        if(Math.abs(deltaY) <= length){icon.style.bottom = (-42 - deltaY)+"px";}
+      }
+    }, {passive: false});
+
+    touch.addEventListener('touchend', (e) => {
+      //if the loading icon was dragged to the buffer point route to the loading screen
+      if(Math.abs(deltaY) >= length){
+        navigate.toLoadingScreen("recipe");
+      }
+      else{
+        //reset the top start y to 0
+        topStartY = 0;
+        //animate the loading icon back to the top of the screen
+        icon.classList.add("slideDown");
+        //reset the overflow y to allow for page scrolling
+        touch.style.overflowY = "scroll";
+      }
+    },{passive: true});
+  }
 }
 
 

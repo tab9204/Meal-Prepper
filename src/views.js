@@ -1,15 +1,11 @@
 /*****app views****/
 import {database} from './database.js';
 import {navigate,views,utilities} from './data.js'
-import {lightBox,loadingImg} from './components.js'
+import {lightBox,loadingImg,pullToReload} from './components.js'
 
 
-//view that lists all meals that have been saved in the meals db
+//lists out all meals saved in the db
 var mealList = {
-  oninit: async (vnode)=>{
-    //await views.mealList.initalize();
-    //m.redraw();
-  },
   view: (vnode)=>{
     return m("mealList#pageContainer",[
       m(lightBox,{//delete the current meal
@@ -19,17 +15,17 @@ var mealList = {
       }),
       m("#pageContent",[
         m(".pageSection",[
-          m("#mealList",views.mealList.allMeals.length >= 1 ? views.mealList.allMeals.map((meal)=>{
-            return m(".mealListItem",{ id: meal.id}, [
-              m(".mealItemName", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
-              m(".mealItemBtns",[
-                m("img.mealItemDelete",{src: "../assets/trashCan.png", onclick: async ()=>{
+          m(".goBtnList",views.mealList.allMeals.length >= 1 ? views.mealList.allMeals.map((meal)=>{
+            return m(".goBtn",{ id: meal.id}, [
+              m("div", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
+              m(".goIcons",[
+                m("img.icon",{src: "../assets/trashCan.png", onclick: async ()=>{
                   //set the meal id for the lightbox so we delete the correct meal
                   views.mealList.lightBox.meal_id =  meal.id;
                   //open the lightbox
                   setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
                 }}),
-                m("img.mealItemEdit",{src: "../assets/navigate.png", onclick: async (e)=>{
+                m("img.icon",{src: "../assets/navigate.png", onclick: async (e)=>{
                     await navigate.toMealEdit(meal.id);
                 }})
               ])
@@ -45,7 +41,132 @@ var mealList = {
   }
 }
 
-//view for editing a meal's data
+//generates a new meal plan or displays an existing one
+var mealPlan = {
+  oncreate: (vnode)=>{
+    //if there is no current meal plan open the meal plan selection lightbox
+    if(views.mealPlan.planData.length <= 0){
+      //hide the main section and show the first selection section
+      document.querySelector("#main.pageSection").classList.add("hidden");
+      document.querySelector("#select.pageSection").classList.remove("hidden");
+      document.getElementById("mainMenu").classList.add("hidden");
+    }
+  },
+  view: (vnode)=>{
+    return m("mealPlan#pageContainer",[
+      m(lightBox,{//delete the current meal plan
+        id: views.mealPlan.lightBox1.id,
+        text: views.mealPlan.lightBox1.text,
+        buttons: views.mealPlan.lightBox1.buttons,
+        vnode: vnode
+      }),
+      m("#pageContent",{onmousedown: ()=>{
+          document.getElementsByClassName("menu")[0].classList.add("hidden");
+      }},[
+        m("#main.pageSection",[
+          m("#mealPlanList",views.mealPlan.planData.map((day,i)=>{
+            return m(".checkBtn",{id: day.id, class: day.checked ? "checked" : "", meal_id: day.meal_id, onclick: (e)=>{
+              views.mealPlan.checkOffDay(e,day.id,day.meal_id);
+            }},[
+              m("div", "Day " +  (i + 1)),
+              m("div", day.name)
+            ])
+          }))
+        ]),
+        m("#select.pageSection.hidden", views.mealPlan.savedMeals.length >= 1 ? [
+          m("div","Tap on a meal to include it in your meal plan"),
+          m("#selectList",[
+            views.mealPlan.savedMeals.map((meal)=>{
+              return m(".checkBtn", {meal_id: meal.id, onclick: (e)=>{
+                views.mealPlan.selectMeal(e,meal.id);
+              }},[
+                m("div",meal.doc.name),
+                m("img",{src:"../assets/plus.png"})
+              ])
+            })
+          ])
+        ] : "You must add meals before you can create a meal plan")
+      ]),
+      m("img.menuBtn#mainMenu",{src:"../assets/menu.png", onclick: ()=>{
+        document.getElementsByClassName("menu")[0].classList.remove("hidden");
+      }}),
+      m("img.menuBtn.hidden#selectMenu",{src:"../assets/check.png", onclick: ()=>{
+        //use the selected meals to create the meal plan
+        views.mealPlan.createPlan(views.mealPlan.selectedMeals);
+      }}),
+      m(".menu.hidden.scaleUp",[
+        m("img.menuIcon",{src: "../assets/trashCan.png", onclick: async ()=>{
+          utilities.lightBox.open("mealPlanLightbox");
+        }}),
+        m("img.menuIcon",{src: "../assets/shoppingCart.png",onclick: async ()=>{
+          await navigate.toShoppingList();
+        }})
+      ])
+    ])
+  }
+}
+
+//provides options for how the user can add a new meal
+var mealOptions = {
+  view: (vnode)=>{
+    return m("mealOptions#pageContainer",[
+      m("#pageContent",[
+        m(".pageSection",[
+          m(".checkBtn",{ onclick: async ()=>{
+            await navigate.toMealEdit(undefined);
+          }},[
+           m("div", "Add your own recipe")
+         ]),
+          m(".checkBtn",{onclick: async ()=>{
+            await navigate.toLoadingScreen("recipe");
+          }}, [
+           m("div", "Find a recipe")
+          ])
+        ])
+      ])
+    ])
+  }
+}
+
+//displays a list of meals that the user can select to add to the db
+var mealSelect = {
+  view: (vnode)=>{
+    return m("mealSelect#pageContainer",[
+      m("#pageContent",[
+        views.mealSelect.recipes.map((recipe,index)=>{
+          return m(".pageSection.fadeIn",[
+            m(".recipe",[
+              m("img.recipeImage", {src:recipe.image}),
+              m(".recipeTitle", recipe.name),
+              m(".recipeInfo",[
+                m(".recipeIngredients.info",[
+                  recipe.ingredients.map((ingredient)=>{
+                    return m("div",ingredient);
+                  })
+                ]),
+                m(".recipeDirections.info",[
+                  recipe.directions.map((direction)=>{
+                    return m("div",direction);
+                  })
+                ])
+              ]),
+              m(".checkBtn",{onclick: async (e)=>{
+                await views.mealSelect.selectRecipe(e,index);
+              }}, "Save this recipe")
+            ])
+          ])
+        })
+      ]),
+      m(pullToReload,{
+        touch: "#pageContent",
+        icon: ".reload",
+        length: 150
+      })
+    ])
+  }
+}
+
+//displays a meals info and allows for editing it
 var mealEdit = {
   oncreate: (vnode)=>{
     if(views.mealEdit.autoFocus){
@@ -60,8 +181,8 @@ var mealEdit = {
             views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
           }})
         ]),
-        m(".pageSection",[
-          m("#toggle",[
+        m(".pageSection.",[
+          m(".toggle",[
             m("#toggleIngredients.toggleBtn.toggled",{onclick: (e)=>{
               //prevent redraw as it will wipe all text from the fields
               e.redraw = false;
@@ -91,76 +212,7 @@ var mealEdit = {
   }
 }
 
-//view for generating a meal plan or displaying an exiting one
-var mealPlan = {
-  oncreate: (vnode)=>{
-    //if there is no current meal plan open the meal plan selection lightbox
-    if(views.mealPlan.planData.length <= 0){
-      //hide the main section and show the first selection section
-      document.querySelector("#main.pageSection").classList.add("hidden");
-      document.querySelector("#select.pageSection").classList.remove("hidden");
-    }
-  },
-  view: (vnode)=>{
-    return m("mealPlan#pageContainer",[
-      m(lightBox,{//delete the current meal plan
-        id: views.mealPlan.lightBox1.id,
-        text: views.mealPlan.lightBox1.text,
-        buttons: views.mealPlan.lightBox1.buttons,
-        vnode: vnode
-      }),
-      m(lightBox,{//selecting how long a meal plan shoud be
-        id: views.mealPlan.lightBox2.id,
-        text: views.mealPlan.lightBox2.text,
-        buttons: views.mealPlan.lightBox2.buttons,
-        vnode: vnode
-      }),
-      m("#pageContent",{onmousedown: ()=>{
-        document.getElementById("mealPlanMenu").classList.add("hidden");
-      }},[
-        m("#main.pageSection",[
-          m("#mealPlanList",views.mealPlan.planData.map((day,i)=>{
-            return m(".btn",{id: day.id, class: day.checked ? "checked" : "", meal_id: day.meal_id, onclick: (e)=>{
-              views.mealPlan.checkOffDay(e,day.id,day.meal_id);
-            }},[
-              m(".mealNumber", "Day " +  (i + 1)),
-              m(".mealName", day.name)
-            ])
-          })),
-          m("img.menu",{src:"../assets/menu.png", onclick: ()=>{
-            document.getElementById("mealPlanMenu").classList.remove("hidden");
-          }})
-        ]),
-        m("#select.pageSection.hidden", views.mealPlan.savedMeals.length >= 1 ? [
-          m("div","Tap on a meal to include it in your meal plan"),
-          views.mealPlan.savedMeals.map((meal)=>{
-            return m(".btn", {meal_id: meal.id, onclick: (e)=>{
-              views.mealPlan.selectMeal(e,meal.id);
-            }},[
-              m("div",meal.doc.name),
-              m(".img","")
-            ])
-          }),
-          m("img.menu.disabled",{src:"../assets/check.png", onclick: ()=>{
-            //use the selected meals to create the meal plan
-            views.mealPlan.createPlan(views.mealPlan.selectedMeals);
-          }})
-        ] : "You must add meals before you can create a meal plan")
-      ]),
-      m("#mealPlanMenu.hidden.scaleUp",[
-        m("img#deleteMealPlan.menuIcon",{src: "../assets/trashCan.png", onclick: async ()=>{
-          utilities.lightBox.open("mealPlanLightbox1");
-        }}),
-        m("img#toShoppingList.menuIcon",{src: "../assets/shoppingCart.png",onclick: async ()=>{
-          await navigate.toShoppingList();
-        }})
-      ])
-    ])
-  }
-}
-
-//view that generates and displays a shopping list
-//lists everything needed to cook the entire meal plan
+//generates and displays a shopping list of ingredients needed for the meal plan
 var shoppingList = {
   view: (vnode)=>{
     return m("shoppingList#pageContainer",[
@@ -185,20 +237,41 @@ var shoppingList = {
   }
 }
 
-//screen that shows a loading icon
+//shows a loading icon
 var loadingScreen = {
-  oninit: ()=>{
+  oninit: async (vnode)=>{
     //disable the nav buttons so the user cannot navigate away during the animation load
-    document.querySelectorAll("#toMealPlan, #toMealList, #toMealEdit").forEach((element) => {
-      element.classList.add("disabled");
-    });
-    setTimeout(() => {
-      document.querySelectorAll("#toMealPlan, #toMealList, #toMealEdit").forEach((element) => {
-        element.classList.remove("disabled");
-      });
-      //navigate back to the meal plan
-      navigate.toMealPlan();
-    }, 2000);
+    utilities.navBar.disable();
+    try{
+      //check the load variable to see what steps to take during loading
+      //meal plan load
+      if(vnode.attrs.load == "plan"){
+        //wait 2 seconds then navigate to the meal plan view
+        //this is a fake load that we do for the benefit of user feedback
+        setTimeout(async() => {
+          //enable the nav bar again
+          utilities.navBar.enable();
+          //navigate back to the meal plan
+          await navigate.toMealPlan();
+        }, 2000);
+      }
+      //recipe load steps
+      else if(vnode.attrs.load == "recipe"){
+        //since this is the inital load of the page we want to make sure the recipes array is empty
+        views.mealSelect.recipes = [];
+        //get a list of recipes from the server
+        await views.mealSelect.getRecipes();
+        //wait at least 2 seconds and then navigate to the meal select screen
+        setTimeout(async() => {
+          utilities.navBar.enable();
+          await navigate.toMealSelect();
+        }, 2000);
+      }
+    }
+    catch(e){
+      //if there was an error while loading route the user back the the list view
+      await navigate.toMealList();
+    }
   },
   view: (vnode)=>{
     return m("loadingScreen#pageContainer",[
@@ -212,4 +285,4 @@ var loadingScreen = {
 }
 
 
-export{mealList,mealEdit,mealPlan,shoppingList,loadingScreen};
+export{mealList,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect};

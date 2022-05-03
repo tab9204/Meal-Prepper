@@ -1,4 +1,4 @@
-var cacheName = 'offlineCache-v7';
+var cacheName = 'offlineCache-v8';
 
 var contentToCache = [
   './manifest.json',
@@ -11,6 +11,8 @@ var contentToCache = [
   './assets/plan.png',
   './assets/menu.png',
   './assets/check.png',
+  './assets/chicken_512.png',
+  './assets/chicken_192.png',
   './assets/WorkSans-VariableFont_wght.ttf',
   './assets/x.png',
   './libraries/mithril.min.js',

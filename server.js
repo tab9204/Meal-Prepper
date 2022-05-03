@@ -5,6 +5,18 @@ const http = require('http');
 const server = http.createServer(app);
 const fs = require('fs');
 const { Client } = require('pg');
+const axios = require('axios');
+
+
+//redirect to https if not already on https
+if(process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.header('x-forwarded-proto') !== 'https')
+      res.redirect(`https://${req.header('host')}${req.url}`)
+    else
+      next()
+  })
+}
 
 /*
 //database client
@@ -55,4 +67,27 @@ app.get("/manifest.json",(req,res) =>{
 
 app.get("/service-worker.js",(req,res) =>{
     res.sendFile(__dirname + '/service-worker.js');
+});
+
+//uses the spoontacular api to get a list of recipes
+app.get('/getRecipes', async (req,res) => {
+  try{
+     const response = await axios.get("https://api.spoonacular.com/recipes/complexSearch", {params:
+       {
+         apiKey:"cdf510754c3541e8a42f14b7384540d1",
+         instructionsRequired:true,
+         fillIngredients:true,
+         addRecipeInformation:true,
+         number:10,
+         sort:"random",
+         type: "main course"
+       }
+     });
+     //send the data to the client
+     res.send(response.data);
+  }
+  catch (error){
+    console.log(error);
+    res.status("500").send({message: 'Failed to retrieve recipes'});
+  }
 });

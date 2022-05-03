@@ -1,6 +1,6 @@
 //********Initalization script that starts the app*****//
 //import views and the mithril library
-import {mealList,mealEdit,mealPlan,shoppingList,loadingScreen} from './views.js';
+import {mealList,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect} from './views.js';
 import {navigate} from './data.js'
 import {navBar} from './components.js'
 import "../libraries/mithril.min.js";
@@ -30,6 +30,8 @@ window.onload = async () =>{
     "/edit": mealEdit,
     "/plan": mealPlan,
     "/shop": shoppingList,
-    "/loading": loadingScreen
+    "/load": loadingScreen,
+    "/options": mealOptions,
+    "/select": mealSelect
   })
 }
