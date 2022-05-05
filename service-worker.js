@@ -1,4 +1,5 @@
-var cacheName = 'offlineCache-v8';
+var cacheName = 'offlineCache-v9';
+
 
 var contentToCache = [
   './manifest.json',
@@ -42,11 +43,10 @@ self.addEventListener('activate', function(event) {
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  var url = event.request;
+self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request).then(function(response) {//respond with cache first
-      return response || fetch(event.request);
+    caches.match(event.request).then(function(response) {
+      return fetch(event.request) || response;
     })
   );
 });
