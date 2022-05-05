@@ -6,6 +6,7 @@ const server = http.createServer(app);
 const fs = require('fs');
 const { Client } = require('pg');
 const axios = require('axios');
+const compression = require('compression');
 
 
 //redirect to https if not already on https
@@ -49,6 +50,8 @@ if(process.env.NODE_ENV === 'production') {
   })
 }
 
+//Compress all HTTP responses
+app.use(compression());
 app.use(express.json());
 //serve the assets
 app.use('/assets', express.static('assets'));

@@ -1,5 +1,5 @@
 /*General styles*/
-html{min-height: 100vh; width: 100%;}
+html{width: 100%;}
 body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: contain; overflow: hidden; background: #E8EAEE;}
 .hidden{display: none !important;}
 .invisible{height: 0 !important; overflow: hidden !important; }
@@ -17,7 +17,7 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 /*lightbox styles*/
 .lightBoxContainer.closed{display: none !important;}
 .lightBoxContainer.open{display: block !important;}
-  .lightBoxBackground{position: absolute; background: black; z-index: 3; opacity: .6; width: 100%; height: 100%;}
+  .lightBoxBackground{position: fixed; background: black; z-index: 3; opacity: .6; width: 100%; height: 100%;}
   .lightBox{position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: #4281A4; border: 1px solid black; width: 80%; max-width: 640px; padding: 10px; z-index: 4;}
     .lightBox .lightboxText{margin-bottom: 10px;}
     .lightBoxButtons{display: flex; justify-content: space-around;}
@@ -67,7 +67,7 @@ mealOptions .pageSection{height: 100%; display: flex; flex-direction: column; ju
     mealOptions .pageSection .checkBtn div{width: 100%;}
 
 mealSelect #pageContent{padding: 0px !important;}
-  mealSelect .recipe{padding-bottom: 5px; border-bottom: 1px solid;}
+  mealSelect .recipe{border-bottom: 1px solid;}
     mealSelect .recipe img{width: 100%;}
     mealSelect .recipe .recipeTitle{padding: 8px; font-size: 1.2em;}
     mealSelect .recipe .recipeInfo .info{padding: 8px 10px;}
@@ -93,15 +93,16 @@ mealEdit .pageSection {margin: 5px;}
   mealEdit textarea:focus, mealEdit input:focus{outline: none;}
 
 
-mealPlan #pageContent{overflow-y: visible !important;}
+mealPlan #pageContent{overflow-y: visible !important; padding: 0px !important;}
   mealPlan .pageSection {display: flex; flex-direction: column; height: 100%;}
-    mealPlan .pageSection #selectList, mealPlan .pageSection #mealPlanList{overflow: scroll;}
+    mealPlan .pageSection #selectList, mealPlan .pageSection #mealPlanList{overflow-y: scroll;;}
   mealPlan .menu {background: #86CB92;}
   mealPlan .checkBtn{position: relative;left: 50%; transform: translateX(-50%); width: 65%;}
     mealPlan #main .checkBtn{background: #86CB92;}
       mealPlan #main .checkBtn div:nth-child(1){border-right: 1px solid; padding: 0 10px 0 10px; min-width:50px;}
       mealPlan #main .checkBtn div:nth-child(2){margin-left: 20px;}
       mealPlan #main .checkBtn.checked{color: grey; border: 1px solid grey !important; background: lightgrey;}
+    mealPlan #select .explainationText {margin: 105px;}
     mealPlan #select .checkBtn{background:lightgrey; justify-content: space-between;}
       mealPlan #select .checkBtn div{width:85%;}
       mealPlan #select .checkBtn .img{background-image: url("../assets/plus.png"); background-size: contain;}
@@ -165,6 +166,12 @@ loadingScreen #toMealEdit{pointer-events: none !important;}
 
 .fadeIn{animation: fadeIn 0.5s; animation-iteration-count: 1; animation-fill-mode: forwards;}
 @keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+.quickFadeIn{animation: quickFadeIn 0.2s; animation-iteration-count: 1; animation-fill-mode: forwards;}
+@keyframes quickFadeIn {
   0% {opacity: 0;}
   100% {opacity: 1;}
 }

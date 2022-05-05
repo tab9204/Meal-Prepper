@@ -31,9 +31,7 @@ var mealList = {
               ])
             ])
           }) : m("#explainationText",[
-            m("div", "Add some meals to get started!"),
-            m("div", "Use the top right button to add a meal."),
-            m("div", "Then use the top left button to create a meal plan.")
+            m("div", "Add some recipes to get started!")
           ]))
         ])
       ])
@@ -74,7 +72,7 @@ var mealPlan = {
           }))
         ]),
         m("#select.pageSection.hidden", views.mealPlan.savedMeals.length >= 1 ? [
-          m("div","Tap on a meal to include it in your meal plan"),
+          m(".explainationText","Tap on a meal to include it in your meal plan"),
           m("#selectList",[
             views.mealPlan.savedMeals.map((meal)=>{
               return m(".checkBtn", {meal_id: meal.id, onclick: (e)=>{
@@ -160,7 +158,7 @@ var mealSelect = {
       m(pullToReload,{
         touch: "#pageContent",
         icon: ".reload",
-        length: 150
+        length: 250
       })
     ])
   }
@@ -200,7 +198,7 @@ var mealEdit = {
               document.getElementById("ingredients").classList.add("hidden");
             }}, "Directions")
           ]),
-          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nAny ingredients placed here will be used when creating the meal plan shopping list.", oninput: (e)=>{
+          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nAny ingredients placed here will be used when creating your shopping list.", oninput: (e)=>{
             views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
           }},views.mealEdit.meal.ingredients),
           m("textarea#directions.hidden",{placeholder: "Add cooking instructions for the meal here.\n\nThis isn't required but is useful when cooking the meal.", oninput: (e)=>{
@@ -221,8 +219,7 @@ var shoppingList = {
           m("#shoppingList",views.shoppingList.list.length >= 1 ? views.shoppingList.list.map((item,i)=>{
             return m(".shoppingListMeal",{item_id: item.meal_id, repeat: item.repeat},[
               m(".nameContainer",[
-                m(".mealName",item.name == "" ? "Nameless Meal" : item.name),
-                m(".mealRepeat",item.repeat >= 2 ?  "x" + item.repeat : "")
+                m(".mealName",item.name == "" ? "Nameless Meal" : item.name)
               ]),
               item.ingredients.length >= 1 ? item.ingredients.map((ingredient,i)=>{
                 return m(".mealIngredient",{class: item.checked.includes(ingredient) ? "checked" : "", onclick: async (e)=>{

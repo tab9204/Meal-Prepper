@@ -540,14 +540,14 @@ const utilities ={
         //calculate how far up the user has dragged their finger since getting to the end of the scroll
         deltaY = y - topStartY;
         //if the delta y is less then the buffer amount move the loading icon by the delta amount
-        if(Math.abs(deltaY) <= length){icon.style.bottom = (-42 - deltaY)+"px";}
+        if(Math.abs(deltaY) <= length){icon.style.bottom = (-42 - (deltaY / 2)) +"px";}
       }
     }, {passive: false});
 
     touch.addEventListener('touchend', (e) => {
       //if the loading icon was dragged to the buffer point route to the loading screen
       if(Math.abs(deltaY) >= length){
-        navigate.toLoadingScreen("recipe");
+      //  navigate.toLoadingScreen("recipe");
       }
       else{
         //reset the top start y to 0
