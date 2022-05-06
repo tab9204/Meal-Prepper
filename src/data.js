@@ -216,7 +216,7 @@ var views = {
         }
       }
       catch(e){
-        console.log(e);
+        return e;
       }
     },
     //selects a recipe and adds it to the meals db
@@ -540,14 +540,16 @@ const utilities ={
         //calculate how far up the user has dragged their finger since getting to the end of the scroll
         deltaY = y - topStartY;
         //if the delta y is less then the buffer amount move the loading icon by the delta amount
-        if(Math.abs(deltaY) <= length){icon.style.bottom = (-42 - (deltaY / 2)) +"px";}
+        if(Math.abs(deltaY) <= length){
+          icon.style.bottom = -42 - (deltaY) +"px";
+        }
       }
     }, {passive: false});
 
     touch.addEventListener('touchend', (e) => {
       //if the loading icon was dragged to the buffer point route to the loading screen
       if(Math.abs(deltaY) >= length){
-      //  navigate.toLoadingScreen("recipe");
+        avigate.toLoadingScreen("recipe");
       }
       else{
         //reset the top start y to 0
