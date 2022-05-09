@@ -6,6 +6,15 @@ import {lightBox,loadingImg,pullToReload} from './components.js'
 
 //lists out all meals saved in the db
 var mealList = {
+  oncreate: ()=>{
+    var element = document.querySelector("#pageContent");
+    var start = views.mealList.overscroll.start;
+    var top = views.mealList.overscroll.top;
+    var bottom = views.mealList.overscroll.bottom;
+    var end = views.mealList.overscroll.end;
+    //init the overscroll functionality
+    utilities.initOverscroll(element,start,top,bottom,end);
+  },
   view: (vnode)=>{
     return m("mealList#pageContainer",[
       m(lightBox,{//delete the current meal
@@ -49,6 +58,15 @@ var mealPlan = {
       document.querySelector("#select.pageSection").classList.remove("hidden");
       document.getElementById("mainMenu").classList.add("hidden");
     }
+    var planElement = document.querySelector("#mealPlanList");
+    var selectElement = document.querySelector("#selectList");
+    var start = views.mealPlan.overscroll.start;
+    var top = views.mealPlan.overscroll.top;
+    var bottom = views.mealPlan.overscroll.bottom;
+    var end = views.mealPlan.overscroll.end;
+    //init the overscroll functionality
+    utilities.initOverscroll(planElement,start,top,bottom,end);
+    utilities.initOverscroll(selectElement,start,top,bottom,end);
   },
   view: (vnode)=>{
     return m("mealPlan#pageContainer",[
@@ -62,7 +80,7 @@ var mealPlan = {
           document.getElementsByClassName("menu")[0].classList.add("hidden");
       }},[
         m("#main.pageSection",[
-          m("#mealPlanList",views.mealPlan.planData.map((day,i)=>{
+          m("#mealPlanList.planList",views.mealPlan.planData.map((day,i)=>{
             return m(".checkBtn",{id: day.id, class: day.checked ? "checked" : "", meal_id: day.meal_id, onclick: (e)=>{
               views.mealPlan.checkOffDay(e,day.id,day.meal_id);
             }},[
@@ -73,7 +91,7 @@ var mealPlan = {
         ]),
         m("#select.pageSection.hidden", views.mealPlan.savedMeals.length >= 1 ? [
           m(".explainationText","Tap on a meal to include it in your meal plan"),
-          m("#selectList",[
+          m("#selectList.planList",[
             views.mealPlan.savedMeals.map((meal)=>{
               return m(".checkBtn", {meal_id: meal.id, onclick: (e)=>{
                 views.mealPlan.selectMeal(e,meal.id);
@@ -156,9 +174,7 @@ var mealSelect = {
         })
       ]),
       m(pullToReload,{
-        touch: "#pageContent",
-        icon: ".reload",
-        length: 250
+        touch: "#pageContent"
       })
     ])
   }

@@ -1,5 +1,6 @@
 /*****view components****/
 import {navigate,utilities} from './data.js'
+import {views} from './data.js'
 
 //on screen lightbox that shows in front of all other content in the view
 //needs to be passed:
@@ -78,10 +79,12 @@ var navBar = {
 //off screen loading icon that can be pulled into view to reload or do some other action
 var pullToReload ={
   oncreate: (vnode)=>{
-    var touch = document.querySelector(vnode.attrs.touch);
-    var icon = document.querySelector(vnode.attrs.icon);
-    //initalize the touch events for the pull to reload
-    utilities.initPullToReload(touch,icon,vnode.attrs.length);
+    var element = document.querySelector(vnode.attrs.touch);
+    var start = views.mealSelect.overscroll.start;
+    var bottom = views.mealSelect.overscroll.bottom;
+    var end = views.mealSelect.overscroll.end;
+    //init the overscroll functionality
+    utilities.initOverscroll(element,start,null,bottom,end);
   },
   view: (vnode)=>{
     return m(".reload",[

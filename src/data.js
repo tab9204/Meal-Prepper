@@ -98,6 +98,60 @@ var views = {
       //set the meal list variable
       views.mealList.allMeals = meals;
       m.redraw();
+    },
+    //variables and functions for oversrolling the meal list
+    overscroll: {
+      drag: 0,
+      start: ()=>{
+        //get the scrolling page element
+        var element = document.querySelector("#pageContent");
+        //reset the element to the default position
+        element.style.top = "0px";
+        //set the overflowY to scroll if not already
+        element.style.overflowY = "scroll";
+        //remove the snap back animation classes
+        element.classList.remove("snapBackTop");
+        element.classList.remove("snapBackBottom");
+        //reset the drag variable
+        views.mealList.overscroll.drag = 0;
+      },
+      top: ()=>{
+        var element = document.querySelector("#pageContent");
+        //if the element has been dragged less then 10 px
+        if(views.mealList.overscroll.drag <= 5){
+          //lock the scrolling
+          element.style.overflowY = "hidden";
+          //move the element by the drag amount
+          element.style.top = (views.mealList.overscroll.drag) +"px";
+          //increment the drag
+          views.mealList.overscroll.drag++;
+        }
+      },
+      bottom: ()=>{
+        var element = document.querySelector("#pageContent");
+        if(views.mealList.overscroll.drag >= -5){
+          element.style.overflowY = "hidden";
+          element.style.top = (views.mealList.overscroll.drag) +"px";
+          views.mealList.overscroll.drag--;
+        }
+      },
+      end: ()=>{
+        var element = document.querySelector("#pageContent");
+        //unlock the elements overflowY scroll
+        element.style.overflowY = "scroll";
+        //if the element has been dragged down
+        if(parseInt(element.style.top) >= 1){
+          //snap the element back to the top and reset the drag
+          element.classList.add("snapBackTop");
+          views.mealList.overscroll.drag = 0;
+        }
+        //if the element was dragged up
+        else if(parseInt(element.style.top) <= -1){
+          //snap the element back to the bottom and reset the drag
+          element.classList.add("snapBackBottom");
+          views.mealList.overscroll.drag = 0;
+        }
+      }
     }
   },
   mealEdit:{
@@ -241,6 +295,39 @@ var views = {
       //object caontaining all the data needed for a new meal entry in the db
       var data = {name: recipe.name, ingredients: ingredientString, directions: directionString, checked: []};
       await database.add(database.meals,id,data);
+    },
+    overscroll: {
+      start: ()=>{
+        //get the scrolling page element
+        var icon = document.querySelector(".reload");
+        //set the loading icon back to its default position
+        icon.style.bottom = "-42px";
+        //remove the slide up animation from the icon
+        icon.classList.remove("slideDown");
+      },
+      bottom: (deltaY)=>{
+        var icon = document.querySelector(".reload");
+        var element = document.querySelector("#pageContent");
+        element.style.overflowY = "hidden";
+        //if the delta y is less then the buffer amount move the loading icon by the delta amount
+        if(Math.abs(deltaY) <= 250){
+          icon.style.bottom = -42 - (deltaY) +"px";
+        }
+      },
+      end: (deltaY)=>{
+        var icon = document.querySelector(".reload");
+        var element = document.querySelector("#pageContent");
+        //if the loading icon was dragged to the buffer point route to the loading screen
+        if(deltaY <= -250){
+          navigate.toLoadingScreen("recipe");
+        }
+        else{
+          //animate the loading icon back to the top of the screen
+          icon.classList.add("slideDown");
+          //reset the overflow y to allow for page scrolling
+          element.style.overflowY = "scroll";
+        }
+      }
     }
   },
   mealPlan:{
@@ -376,6 +463,60 @@ var views = {
       else{
         document.querySelector("#selectMenu").classList.add("hidden");
       }
+    },
+    //variables and functions for oversrolling the meal list
+    overscroll: {
+      drag: 0,
+      start: ()=>{
+        //get the scrolling page element
+        var element = document.querySelector(".pageSection:not(.hidden) .planList")
+        //reset the element to the default position
+        element.style.top = "0px";
+        //set the overflowY to scroll if not already
+        element.style.overflowY = "scroll";
+        //remove the snap back animation classes
+        element.classList.remove("snapBackTop");
+        element.classList.remove("snapBackBottom");
+        //reset the drag variable
+        views.mealList.overscroll.drag = 0;
+      },
+      top: ()=>{
+        var element = document.querySelector(".pageSection:not(.hidden) .planList")
+        //if the element has been dragged less then 10 px
+        if(views.mealList.overscroll.drag <= 5){
+          //lock the scrolling
+          element.style.overflowY = "hidden";
+          //move the element by the drag amount
+          element.style.top = (views.mealList.overscroll.drag) +"px";
+          //increment the drag
+          views.mealList.overscroll.drag++;
+        }
+      },
+      bottom: ()=>{
+        var element = document.querySelector(".pageSection:not(.hidden) .planList")
+        if(views.mealList.overscroll.drag >= -5){
+          element.style.overflowY = "hidden";
+          element.style.top = (views.mealList.overscroll.drag) +"px";
+          views.mealList.overscroll.drag--;
+        }
+      },
+      end: ()=>{
+        var element = document.querySelector(".pageSection:not(.hidden) .planList")
+        //unlock the elements overflowY scroll
+        element.style.overflowY = "scroll";
+        //if the element has been dragged down
+        if(parseInt(element.style.top) >= 1){
+          //snap the element back to the top and reset the drag
+          element.classList.add("snapBackTop");
+          views.mealList.overscroll.drag = 0;
+        }
+        //if the element was dragged up
+        else if(parseInt(element.style.top) <= -1){
+          //snap the element back to the bottom and reset the drag
+          element.classList.add("snapBackBottom");
+          views.mealList.overscroll.drag = 0;
+        }
+      }
     }
   },
   shoppingList:{
@@ -507,57 +648,68 @@ const utilities ={
     //wait 300 ms to allow time for the nav animation to finish
     return new Promise((resolve) => {setTimeout(() => {resolve()}, time)});
   },
-  //initalizes the touch move events needed for the pull to reload component
-  //touch => the screen element that is listening to the touch events
-  //icon => the html of the loading icon on the page
-  //length => number of px the loading icon must be pulled to start the reload
-  initPullToReload: (touch,icon,length)=>{
+  //initalizes over scroll functionality on a specified element
+  //determines what should happen when a scrollable element reaches the end of its scroll and the user continues to scroll
+  //element => the scrollable element to attach the event listners on
+  //start => function to run when user touch starts
+  //top => function to run when the user is scrolling at the top of the page
+  //bottom => function to run when the user is scrolling at the bottom of the page
+  //end => function to run when the user touch ends
+  initOverscroll: (element,start,top,bottom,end)=>{
     //the Y postion of the user's finger when dragging starts
-   var startY;
-   //The starting Y position of the user's finger when the page container is at the top of its scroll
-   var topStartY = 0;
-   //how many px the user has swiped down since reaching the top of the container
+   var dragStartY;
+   //The starting Y position of the user's finger when the element reaches the end of its scroll
+   var endScrollY = 0;
+   //how many px the user has swiped down since reaching the end of its scroll
    var deltaY = 0;
    //add the touch start, touch move, and touch end event listeners to the touch element
-   touch.addEventListener('touchstart', (e)=>{
-      //set the startY
-      startY = e.touches[0].pageY;
-      //set the loading icon back to its default position
-      icon.style.bottom = "-42px";
-      //remove the slide up animation from the icon
-      icon.classList.remove("slideDown");
+   element.addEventListener('touchstart', (e)=>{
+      //set the dragStartY
+      dragStartY = e.touches[0].pageY;
+      //run the start function
+      if(start !== null){
+        start(deltaY);
+      }
     }, {passive: true});
 
-    touch.addEventListener('touchmove', (e) => {
-      //y position of the user's finger during the touch drag
+    element.addEventListener('touchmove', (e) => {
+      //y position of the user's finger during the touch move
       var y = e.touches[0].pageY;
-      //if the page container is at the bottom of its scroll and the user is swiping up
-      if (Math.ceil(touch.offsetHeight + touch.scrollTop) >= touch.scrollHeight && y < startY) {
-        //set the overflow to hidden so that the page cannot scroll during the swipe
-        touch.style.overflowY = "hidden";
-        //set the topStartY if it has not already been set
-        if(topStartY == 0){topStartY = y;}
-        //calculate how far up the user has dragged their finger since getting to the end of the scroll
-        deltaY = y - topStartY;
-        //if the delta y is less then the buffer amount move the loading icon by the delta amount
-        if(Math.abs(deltaY) <= length){
-          icon.style.bottom = -42 - (deltaY) +"px";
+      //if the user is at the top of the element scroll and is swiping down
+      if (element.scrollTop == 0 && y > dragStartY) {
+        //set the endScrollY if it has not already been set
+        if(endScrollY == 0){endScrollY = y;}
+        //calculate the deltaY
+        deltaY = y - endScrollY;
+        //pass the deltaY to the top function and run it
+        if(top !== null){
+          top(deltaY);
         }
+      }
+      //if the user is at the bottom of the element scroll and is swiping up
+      else if(Math.ceil(element.offsetHeight + element.scrollTop) >= element.scrollHeight && y < dragStartY){
+        //set the endScrollY if it has not already been set
+        if(endScrollY == 0){endScrollY = y;}
+        //calculate the deltaY
+        deltaY = y - endScrollY;
+        //pass the deltaY to the bottom function and run it
+        if(bottom !== null){
+          bottom(deltaY);
+        }
+      }
+      //if the scroll is neither at the top or bottom or the page
+      else if(element.scrollTop != 0 || Math.ceil(element.offsetHeight + element.scrollTop) <= element.scrollHeight){
+        //reset the endScrollY to 0
+        endScrollY = 0;
       }
     }, {passive: false});
 
-    touch.addEventListener('touchend', (e) => {
-      //if the loading icon was dragged to the buffer point route to the loading screen
-      if(Math.abs(deltaY) >= length){
-        avigate.toLoadingScreen("recipe");
-      }
-      else{
-        //reset the top start y to 0
-        topStartY = 0;
-        //animate the loading icon back to the top of the screen
-        icon.classList.add("slideDown");
-        //reset the overflow y to allow for page scrolling
-        touch.style.overflowY = "scroll";
+    element.addEventListener('touchend', (e) => {
+      //reset the endScrollY to 0
+      endScrollY = 0;
+      //run the end function
+      if(end !== null){
+        end(deltaY);
       }
     },{passive: true});
   }
