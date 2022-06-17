@@ -1,21 +1,15 @@
-var cacheName = 'offlineCache-v9';
+var cacheName = 'offlineCache-v10';
 
 
 var contentToCache = [
   './manifest.json',
   './assets/loading.gif',
-  './assets/navigate.png',
   './assets/plus.png',
-  './assets/shoppingCart.png',
-  './assets/trashCan.png',
   './assets/home.png',
   './assets/plan.png',
-  './assets/menu.png',
-  './assets/check.png',
   './assets/chicken_512.png',
   './assets/chicken_192.png',
   './assets/WorkSans-VariableFont_wght.ttf',
-  './assets/x.png',
   './libraries/mithril.min.js',
   './libraries/pouchdb-7.2.1.js'
 ];

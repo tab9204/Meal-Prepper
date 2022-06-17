@@ -9,16 +9,6 @@ const axios = require('axios');
 const compression = require('compression');
 
 
-//redirect to https if not already on https
-if(process.env.NODE_ENV === 'production') {
-  app.use((req, res, next) => {
-    if (req.header('x-forwarded-proto') !== 'https')
-      res.redirect(`https://${req.header('host')}${req.url}`)
-    else
-      next()
-  })
-}
-
 /*
 //database client
 const client = new Client({

@@ -67,7 +67,7 @@ var views = {
     lightBox: {
       meal_id: null, //the id of the meal that should be deleted if the user selects delete
       id: "mealListLightBox",
-      text: "Are you sure you want to delete this meal?",
+      text: "Delete this meal?",
       buttons: [
         {
           click: async (vnode)=>{
@@ -333,7 +333,7 @@ var views = {
   mealPlan:{
     lightBox1: {
       id: "mealPlanLightbox",
-      text: "Delete this meal plan and start over with a new one?",
+      text: "Delete this meal plan and start a new one?",
       buttons: [
         {
           click: async (vnode)=>{

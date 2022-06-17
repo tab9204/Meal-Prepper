@@ -1,7 +1,7 @@
 /*****app views****/
 import {database} from './database.js';
 import {navigate,views,utilities} from './data.js'
-import {lightBox,loadingImg,pullToReload} from './components.js'
+import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon} from './components.js'
 
 
 //lists out all meals saved in the db
@@ -28,15 +28,19 @@ var mealList = {
             return m(".goBtn",{ id: meal.id}, [
               m("div", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
               m(".goIcons",[
-                m("img.icon",{src: "../assets/trashCan.png", onclick: async ()=>{
-                  //set the meal id for the lightbox so we delete the correct meal
-                  views.mealList.lightBox.meal_id =  meal.id;
-                  //open the lightbox
-                  setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
-                }}),
-                m("img.icon",{src: "../assets/navigate.png", onclick: async (e)=>{
+                m(trashCan,{
+                  click: ()=>{
+                    //set the meal id for the lightbox so we delete the correct meal
+                    views.mealList.lightBox.meal_id =  meal.id;
+                    //open the lightbox
+                    setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
+                  }
+                }),
+                m(navigateIcon,{
+                  click: async () =>{
                     await navigate.toMealEdit(meal.id);
-                }})
+                  }
+                })
               ])
             ])
           }) : m("#explainationText",[
@@ -103,20 +107,28 @@ var mealPlan = {
           ])
         ] : "You must add meals before you can create a meal plan")
       ]),
-      m("img.menuBtn#mainMenu",{src:"../assets/menu.png", onclick: ()=>{
-        document.getElementsByClassName("menu")[0].classList.remove("hidden");
-      }}),
-      m("img.menuBtn.hidden#selectMenu",{src:"../assets/check.png", onclick: ()=>{
-        //use the selected meals to create the meal plan
-        views.mealPlan.createPlan(views.mealPlan.selectedMeals);
-      }}),
+      m(menuIcon),
+      m(checkIcon,{
+        id: "selectMenu",
+        class: "menuBtn hidden",
+        click: () =>{
+          //use the selected meals to create the meal plan
+          views.mealPlan.createPlan(views.mealPlan.selectedMeals);
+        }
+      }),
       m(".menu.hidden.scaleUp",[
-        m("img.menuIcon",{src: "../assets/trashCan.png", onclick: async ()=>{
-          utilities.lightBox.open("mealPlanLightbox");
-        }}),
-        m("img.menuIcon",{src: "../assets/shoppingCart.png",onclick: async ()=>{
-          await navigate.toShoppingList();
-        }})
+        m(trashCan,{
+          class: "menuIcon",
+          click: ()=>{
+            utilities.lightBox.open("mealPlanLightbox");
+          }
+        }),
+        m(shoppingCartIcon,{
+          class: "menuIcon",
+          click: async ()=>{
+            await navigate.toShoppingList();
+          }
+        })
       ])
     ])
   }
