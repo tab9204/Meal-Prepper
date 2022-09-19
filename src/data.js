@@ -26,8 +26,15 @@ var navigate = {
   //navigates to the shopping list view
   toShoppingList: async ()=>{
     await views.shoppingList.initalize();
-    //route to the shopping list view
-    m.route.set('/shop');
+    //if the shopping list is empty
+    if(views.shoppingList.list.length <= 0){
+      //reroute to the meal plan view
+      await navigate.toMealPlan();
+    }
+    else{
+      //route to the shopping list view
+      m.route.set('/shop');
+    }
   },
   //navigates to the loading screen view
   //load => string that specifies what what steps to take during loading and what page to route to after the loading is complete
@@ -73,6 +80,11 @@ var views = {
           click: async (vnode)=>{
             //delete the selected recipe from the db
             await database.delete(database.meals,views.mealList.lightBox.meal_id);
+            //delete the meal from the meal plan if it is on it
+            var meal = await database.get(database.mealPlan,views.mealList.lightBox.meal_id);
+            if(meal !== ""){
+              await database.delete(database.mealPlan,views.mealList.lightBox.meal_id);
+            }
             //reload the meal list page by navigating back to it
             await navigate.toMealList();
             //close the lightbox
@@ -93,8 +105,8 @@ var views = {
     initalize: async ()=>{//initalizes the view data
       //get an up to date list of meals from the meals db
       var meals = await database.getAll(database.meals);
-      //sort the meals in order of newest to oldest
-      meals.sort((a,b)=>{return b.id - a.id;});
+      //sort the meals in alphabetical order
+      meals.sort((a,b)=>{return a.doc.name.localeCompare(b.doc.name);});
       //set the meal list variable
       views.mealList.allMeals = meals;
       m.redraw();
@@ -199,7 +211,7 @@ var views = {
     //on input change
     //e => event data
     //id => id of the meal being edited
-    //id => the checked ingredients array for the meal
+    //checked => the checked ingredients array for the meal
     onChange: (e,id,checked)=>{
       //prevent mithril from redrawing the view
       //if we did not do this the text in the textarea would be removed
@@ -331,80 +343,32 @@ var views = {
     }
   },
   mealPlan:{
-    lightBox1: {
-      id: "mealPlanLightbox",
-      text: "Delete this meal plan and start a new one?",
-      buttons: [
-        {
-          click: async (vnode)=>{
-            await views.mealPlan.deletePlan();//delete the meal plan
-            //close the lightboxes
-            utilities.lightBox.close("mealPlanLightbox");
-            //hide the main section and show the first selection section
-            document.querySelector("#main.pageSection").classList.add("hidden");
-            document.querySelector("#select.pageSection").classList.remove("hidden");
-            //make sure the menu popup is closed
-            document.getElementsByClassName("menu")[0].classList.add("hidden");
-            //switch the menu buttons
-            document.getElementById("mainMenu").classList.add("hidden");
-            document.getElementById("selectMenu").classList.add("hidden");
-          },
-          text: "Delete"
-        },
-        {
-          click: (vnode) =>{
-            utilities.lightBox.close("mealPlanLightbox");
-          },
-          text: "Cancel"
-        }
-      ]
-    },
-    planData: [],//meal plan data needed to render the view
     savedMeals: [],//list of all saved meals available to use in the meal plan
     selectedMeals: [],//list of meals selected to be added to the meal plan
     initalize: async ()=>{
-      //empty the plan data, saved meals, and selected meals arrays
-      views.mealPlan.planData = [];
       views.mealPlan.savedMeals = [];
       views.mealPlan.selectedMeals = [];
-      //get all days in the meal plan
-      var mealPlan = await database.getAll(database.mealPlan);
       //get all the saved meals
       var allMeals = await database.getAll(database.meals);
-      //loop through all the days
-      for (var day of mealPlan) {
-        //get the name and id of the meal on each day of the plan
-        var meal = await database.get(database.meals,day.doc.meal_id);
-        var name = meal.name;
-        var meal_id = meal._id;
-        //add an object with the meal name, meal id, day id and checked boolan to the meal plan array
-        views.mealPlan.planData.push({name: name, meal_id:meal_id, id: day.id, checked: day.doc.checked});
-      }
-      //loop through all the meals
-      for (var meal of allMeals) {
-        views.mealPlan.savedMeals.push(meal);
-      }
+      //sort the meals alphabetically
+      allMeals.sort((a,b)=>{return a.doc.name.localeCompare(b.doc.name)});
+      //set the saved meals array to all the returned meals
+      views.mealPlan.savedMeals = allMeals;
     },
-    //creates a meal plan by added meals to the meal plan db
-    //meals => the ids of the meals selected to be added to the meal plan
+    //adds a group of meals to the meal plan db
+    //meals => the ids of the meals to be added to the meal plan
     createPlan: async (meals)=>{
-      //shuffle the order of the meals
-      utilities.shuffle(meals);
-      //the id of the new entry in the meal plan db
-      var dayId = 0;
       //loop through each meal
       for (var meal of meals) {
         //build the object containing the data needed for the new day in the meal plan
         var day = {meal_id: meal, checked: false};
         //add a new entry to the meal plan db
-        await database.add(database.mealPlan,dayId + "",day);
-        //increment the day id
-        dayId++;
+        await database.add(database.mealPlan,day.meal_id,day);
       }
-      //navigate to the meal plan view. This will re-render the view with the most up to date meal plan
-      navigate.toLoadingScreen("plan");
+      //navigate to the shopping list view
+      navigate.toLoadingScreen("shopping");
     },
-    //deletes the current meal plan from the db
+    //deletes the meals in the meal plan db
     deletePlan: async ()=>{
       //get all days in the meal plan
       var allDays = await database.getAll(database.mealPlan);
@@ -424,20 +388,6 @@ var views = {
         //now we can delete the meal from the meal plan
         await database.delete(database.mealPlan,allDays[i].id + "");
       }
-    },
-    //toggles if a day in the meal plan has been checked
-    //e => the click event data
-    //day_id => id of the day clicked on
-    //meal_id => id of the meal on the day clicked on
-    checkOffDay: async (e,day_id,meal_id)=>{
-      //toggle the checked class on the button's parent element
-      e.currentTarget.classList.toggle("checked");
-      //get the meal plan data so that that the db entry can be updated
-      var checked = e.currentTarget.classList.contains("checked");
-      //create the object containing the updated data
-      var update = {meal_id: meal_id, checked: checked};
-      //update the entry in the db
-      await database.update(database.mealPlan,day_id,update);
     },
     //selects a meal for the meal plan
     //e => element the triggered the the event
@@ -529,16 +479,8 @@ var views = {
       var mealPlan = await database.getAll(database.mealPlan);
       //if the meal plan is empty exit the function
       if(mealPlan.length <= 0){return;}
-      //loop through the meal plan and count up how many times each meal appears in the entire plan
-      const repeats = {};
-      mealPlan.forEach((meal) => {
-        repeats[meal.doc.meal_id] = (repeats[meal.doc.meal_id] || 0) + 1;
-      });
       //loop through the meal plan
       for (var day of mealPlan){
-        //add the id of each meal in the meal plan to the shopping list
-        //for any duplicate meals increment the repeat number
-        //shoppingList.push({meal_id:id,name:name:ingredients,checked:[]})
         //get the meal data for the meal of the day
         var meal = await database.get(database.meals,day.doc.meal_id);
         //if the meal is not in the db skip it
@@ -550,7 +492,7 @@ var views = {
         var strToArry = meal.ingredients.split("\n").filter(ingredient => ingredient);
         var ingredients = strToArry.length >= 1 ? strToArry : [];
         //object containing all the meal data needed to shop for this meal
-        var addToList = {meal_id: meal._id, name: meal.name, ingredients: ingredients, checked: checked, repeat: repeats[meal._id]};
+        var addToList = {meal_id: meal._id, name: meal.name, ingredients: ingredients, checked: checked};
         //find if this list item has already been added to the shopping list
         var duplicate = shoppingList.some((item)=>{if(item.meal_id == meal._id){return true;}})
         //if this data has not already been added to the shopping list add it
@@ -588,7 +530,30 @@ var views = {
       //update the meal entry with the new checked array
       var update = {name: meal.name, ingredients:meal.ingredients, directions:meal.directions, checked: meal.checked};
       await database.update(database.meals,meal._id,update);
-    }
+    },
+    lightBox: {
+      id: "shoppingListLightbox",
+      text: "Delete this shopping list and start a new one?",
+      buttons: [
+        {
+          click: async (vnode)=>{
+            //delete the meal plan
+            await views.mealPlan.deletePlan();
+            //empty the shopping list
+            views.shoppingList.list = [];
+            //route to the meal plan view
+            await navigate.toMealPlan();
+          },
+          text: "Delete"
+        },
+        {
+          click: (vnode) =>{
+            utilities.lightBox.close("shoppingListLightbox");
+          },
+          text: "Cancel"
+        }
+      ]
+    },
   }
 }
 
