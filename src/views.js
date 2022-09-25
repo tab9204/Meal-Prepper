@@ -1,7 +1,7 @@
 /*****app views****/
 import {database} from './database.js';
 import {navigate,views,utilities} from './data.js'
-import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon} from './components.js'
+import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon} from './components.js'
 
 
 //lists out all meals saved in the db
@@ -26,22 +26,33 @@ var mealList = {
       m("#pageContent",[
         m(".pageSection", views.mealList.allMeals.length >= 1 ? [//if there is at least 1 meal already saved
           m(".goBtnList", views.mealList.allMeals.map((meal)=>{
-            return m(".goBtn",{ id: meal.id}, [
+            return m(".goBtn",{
+                id: meal.id,
+                //mobile gestures
+                ontouchstart: (e)=>{
+                  views.mealList.startHold(e,meal.id);
+                },
+                ontouchend: (e)=>{
+                  views.mealList.cancelHold(e);
+                },
+                //desktop gestures
+                onmousedown: (e)=>{
+                  views.mealList.startHold(e,meal.id);
+                },
+                onmouseup: (e)=>{
+                  views.mealList.cancelHold(e);
+                },
+                onmouseleave: (e)=>{
+                  views.mealList.cancelHold(e);
+                },
+                //on click
+                onclick: async () =>{
+                  await navigate.toMealEdit(meal.id);
+                }
+              }, [
               m("div", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
               m(".goIcons",[
-                m(trashCan,{
-                  click: ()=>{
-                    //set the meal id for the lightbox so we delete the correct meal
-                    views.mealList.lightBox.meal_id =  meal.id;
-                    //open the lightbox
-                    setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
-                  }
-                }),
-                m(navigateIcon,{
-                  click: async () =>{
-                    await navigate.toMealEdit(meal.id);
-                  }
-                })
+                m(navigateIcon)
               ])
             ])
           }))
@@ -91,7 +102,7 @@ var mealEdit = {
           m("textarea#directions.hidden",{placeholder: "Add cooking instructions for the meal here.\n\nThis isn't required but is useful when cooking the meal.", oninput: (e)=>{
             views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
           }},views.mealEdit.meal.directions)
-        ])
+        ]),
       ])
     ])
   }
@@ -159,7 +170,7 @@ var mealPlan = {
                 views.mealPlan.selectMeal(e,meal.id);
               }},[
                 m("div",meal.doc.name),
-                m("img",{src:"../assets/plus.png"})
+                m(plusIcon,{class:"plusIcon"})
               ])
             })
           ])

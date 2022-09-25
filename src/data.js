@@ -164,7 +164,36 @@ var views = {
           views.mealList.overscroll.drag = 0;
         }
       }
+    },
+    //timeout function for the go btn hold gesture
+    holdTimeout: null,
+    //starts a go btn hold gesture
+    //e => the event that triggered the hold
+    //id => the id of the meal from the btn the user pressed
+    startHold: (e,id)=>{
+      console.log("start hold");
+      //clear the hold timeout function
+      clearTimeout(views.mealList.holdTimeout);
+      //set a new timeout
+      //run the hold function after 1 second of holding
+      views.mealList.holdTimeout = setTimeout(()=>{
+        navigator.vibrate(100);
+        //set the meal id for the lightbox so we delete the correct meal
+        views.mealList.lightBox.meal_id = id;
+        //add the held class to the btn that was held down
+      //  e.target.classList.add("held");
+        //open the lightbox
+        setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
+        console.log("held");
+      },1500);
+    },
+    //stops a go btn hold gesture
+    cancelHold: (e)=>{
+      console.log("end hold");
+      //e.target.classList.remove("held");
+      clearTimeout(views.mealList.holdTimeout);
     }
+
   },
   mealEdit:{
     //reference to the setTimout function
