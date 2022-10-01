@@ -128,6 +128,7 @@ var views = {
         views.mealList.overscroll.drag = 0;
       },
       top: ()=>{
+
         var element = document.querySelector("#pageContent");
         //if the element has been dragged less then 10 px
         if(views.mealList.overscroll.drag <= 5){
@@ -138,6 +139,8 @@ var views = {
           //increment the drag
           views.mealList.overscroll.drag++;
         }
+        //cancel the delete hold
+        views.mealList.cancelHold();
       },
       bottom: ()=>{
         var element = document.querySelector("#pageContent");
@@ -146,6 +149,8 @@ var views = {
           element.style.top = (views.mealList.overscroll.drag) +"px";
           views.mealList.overscroll.drag--;
         }
+        //cancel the delete hold
+        views.mealList.cancelHold();
       },
       end: ()=>{
         var element = document.querySelector("#pageContent");

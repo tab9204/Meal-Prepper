@@ -23,7 +23,7 @@ var mealList = {
         text:  views.mealList.lightBox.text,
         buttons: views.mealList.lightBox.buttons
       }),
-      m("#pageContent",[
+      m("#pageContent",{onscroll: (e)=> {views.mealList.cancelHold(e);}},[//when the view scrolls cancel the delete hold timer 
         m(".pageSection", views.mealList.allMeals.length >= 1 ? [//if there is at least 1 meal already saved
           m(".goBtnList", views.mealList.allMeals.map((meal)=>{
             return m(".goBtn",{
