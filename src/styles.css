@@ -25,7 +25,7 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
       .lightboxBtn{padding: 8px 10px; background: #86CB92; border:1px solid; border-radius: 5px; box-shadow: 0.25px 0.5px 0.5px black;}
 
 /*navigation bar styles*/
-.navBar{justify-content: space-between; width: 100%; min-height: 50px; overflow: hidden; background: #4281A4; display: flex; z-index: 2;}
+.navBar{justify-content: space-between; width: 100%; overflow: hidden; background: #4281A4; display: flex; z-index: 2; padding: 3px;}
   .navBtnContainer{display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 25px; position: relative;}
     .navBtnContainer .icon{width:45px !important; height: 45px !important;}
   .btnBackground{width: 10px; height: 10px; background: white; transform-origin: center; border-radius: 20px; position: absolute;}
@@ -46,13 +46,6 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 .toggle{display: flex; justify-content: space-evenly;}
   .toggleBtn{padding: 7px; margin: 5px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
     .toggleBtn.toggled{box-shadow: none;}
-/*go button*/
-.goBtnList{display: flex; flex-wrap: wrap; justify-content: center;}
-  .goBtn{border: 1px solid; border-radius: 10px; background: #86CB92; box-shadow: 0.5px 1px 1px black; min-width: 100px; max-width: 90%; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; justify-content: space-between; width: 100%; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
-    .goBtn .goIcons{min-width: 80px; display: flex; margin-left: 7px; justify-content: end;}
-      .goBtn .goIcons .icon{width: 35px; height: 35px;}
-  .goBtn.held{background: lightgrey; color: grey; box-shadow: none;}
-    .goBtn.held .goIcons{display: none;}
 /*menu button*/
 .menuBtn{ width: 35px; height: 40px; position: absolute; bottom: 0px; left: 0px; display: flex; flex-direction: column; justify-content: space-evenly;}
   .dot{width:8px; height:8px; background:black; border-radius:13px; align-self: center;}
@@ -62,8 +55,10 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 
 /**view styles***/
 mealList #mealList{display: flex; flex-wrap: wrap; justify-content: center;}
-  mealList .mealListItem{border-bottom: 1px solid; min-width: 100px; min-height: 35px; margin: 5px 0; padding: 5px; display: flex; align-items: center; justify-content: space-between;width: 100%;}
-  mealList .goIcons .icon:nth-child(1){transform: rotate(180deg);}
+  mealList .section{display: flex; flex-direction: column; margin: 5px 0; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
+    mealList .section .sectionTitle{font-size: 1.3em; font-weight: bold; border-bottom: 2px solid;}
+      mealList .section .sectionList .sectionMeal{display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 5px; font-size: 1.2em; margin: 5px 0; border-radius: 5px; background: #e0dede; word-break: break-all;}
+      mealList .section:has(> .sectionList:empty) {display: none;}
 
 /*mealOptions .pageSection{position: relative; transform: translate(-50%,-50%); left: 50%; top: 50%; display: flex; flex-direction: column; align-items: center;}*/
 mealOptions .pageSection{height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;}
@@ -101,7 +96,7 @@ mealPlan #pageContent{overflow-y: visible !important; padding: 0px !important;}
   mealPlan .pageSection {display: flex; flex-direction: column; height: 100%;}
     mealPlan .pageSection #selectList, mealPlan .pageSection #mealPlanList{overflow-y: scroll; position: relative;}
   mealPlan .menu {background: #86CB92;}
-  mealPlan .checkBtn{position: relative;left: 50%; transform: translateX(-50%); width: 65%; min-width: 230px; font-size: 1em !important;}
+  mealPlan .checkBtn{position: relative;left: 50%; transform: translateX(-50%); width: 65%; font-size: 1em !important; word-break: break-all;}
     mealPlan #main .checkBtn{background: #86CB92;}
       mealPlan #main .checkBtn div:nth-child(1){border-right: 1px solid; padding: 0 5px 0 10px; min-width:55px;}
       mealPlan #main .checkBtn div:nth-child(2){margin-left: 20px;}
@@ -114,13 +109,13 @@ mealPlan #pageContent{overflow-y: visible !important; padding: 0px !important;}
       mealPlan #select .checkBtn .plusIcon{width: 20px; height: 20px; margin-left: 7px;}
 
 shoppingList .menu {background: #86CB92;}
-shoppingList #shoppingList{margin: 0px auto; max-width: 330px;}
+shoppingList #shoppingList{margin: 0px auto; max-width: 330px; width: 80%;}
   shoppingList .shoppingListMeal{padding: 8px 5px;}
     shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
     shoppingList .mealName{font-size: 1.4em;}
     shoppingList .mealRepeat{margin: 5px 0;}
-    shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 5px 0; display: list-item; list-style-type: disc; list-style-position: outside; margin-left: 20px;}
-    shoppingList .mealIngredient.checked{text-decoration: line-through;}
+    shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 5px 0; display: list-item; list-style-type: disc; list-style-position: outside; margin-left: 20px; word-break: break-all;}
+    shoppingList .mealIngredient.checked{text-decoration: line-through; color: #a6a6a6;}
 
 loadingScreen #loadingImg{z-index: 2; background: #faf9f6; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);}
 loadingScreen #toMealPlan{pointer-events: none !important;}

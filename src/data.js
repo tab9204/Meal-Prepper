@@ -102,6 +102,8 @@ var views = {
       ]
     },
     allMeals: [],//array containg the meal data needed to render the view
+    allowedChracters:[],//the chracters allowed when sorting meals
+    unsortedMeals:[],//meals whos name begins with a character that is now allowed as a category
     initalize: async ()=>{//initalizes the view data
       //get an up to date list of meals from the meals db
       var meals = await database.getAll(database.meals);
@@ -109,6 +111,22 @@ var views = {
       meals.sort((a,b)=>{return a.doc.name.localeCompare(b.doc.name);});
       //set the meal list variable
       views.mealList.allMeals = meals;
+      //init the allowedChracters with all the alphanumeric chracters used to sort the meals
+      //for this use the character codes for A-Z which is 65 - 90
+      views.mealList.allowedChracters = [];
+      for(var i = 65; i <= 90; i++){
+        views.mealList.allowedChracters.push(i);
+      }
+      //add meals with disallowed chacters to the unsorted array
+      views.mealList.unsortedMeals = [];
+      views.mealList.allMeals.map((meal)=>{
+        //the char code of the first character in the meal name
+        var firstCharCode = meal.doc.name.charAt(0).toUpperCase().charCodeAt(0);
+        if(firstCharCode < 65 || firstCharCode > 90){
+          views.mealList.unsortedMeals.push(meal);
+        }
+      });
+      //redraw the view
       m.redraw();
     },
     //variables and functions for oversrolling the meal list

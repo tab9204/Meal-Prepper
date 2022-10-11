@@ -1,7 +1,7 @@
 /*****app views****/
 import {database} from './database.js';
 import {navigate,views,utilities} from './data.js'
-import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon} from './components.js'
+import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon,plusIconSmall} from './components.js'
 
 
 //lists out all meals saved in the db
@@ -23,39 +23,80 @@ var mealList = {
         text:  views.mealList.lightBox.text,
         buttons: views.mealList.lightBox.buttons
       }),
-      m("#pageContent",{onscroll: (e)=> {views.mealList.cancelHold(e);}},[//when the view scrolls cancel the delete hold timer 
+      m("#pageContent",{onscroll: (e)=> {views.mealList.cancelHold(e);}},[//when the view scrolls cancel the delete hold timer
         m(".pageSection", views.mealList.allMeals.length >= 1 ? [//if there is at least 1 meal already saved
-          m(".goBtnList", views.mealList.allMeals.map((meal)=>{
-            return m(".goBtn",{
-                id: meal.id,
-                //mobile gestures
-                ontouchstart: (e)=>{
-                  views.mealList.startHold(e,meal.id);
-                },
-                ontouchend: (e)=>{
-                  views.mealList.cancelHold(e);
-                },
-                //desktop gestures
-                onmousedown: (e)=>{
-                  views.mealList.startHold(e,meal.id);
-                },
-                onmouseup: (e)=>{
-                  views.mealList.cancelHold(e);
-                },
-                onmouseleave: (e)=>{
-                  views.mealList.cancelHold(e);
-                },
-                //on click
-                onclick: async () =>{
-                  await navigate.toMealEdit(meal.id);
-                }
-              }, [
-              m("div", meal.doc.name == "" ? "Nameless Meal" : meal.doc.name),
-              m(".goIcons",[
-                m(navigateIcon)
+          m("#recipeList",[
+            m("#sortedList",views.mealList.allowedChracters.map((c)=>{//loop through all allowed catagory characters
+              return m(".section",[
+                m(".sectionTitle",String.fromCharCode(c)),//convert the char code to a string
+                m(".sectionList",views.mealList.allMeals.map((meal)=>{//loop through all recipes
+                  if(meal.doc.name.charAt(0).toUpperCase().charCodeAt(0) == c){
+                    return m(".sectionMeal",{
+                        id: meal.id,
+                        //mobile gestures
+                        ontouchstart: (e)=>{
+                          views.mealList.startHold(e,meal.id);
+                        },
+                        ontouchend: (e)=>{
+                          views.mealList.cancelHold(e);
+                        },
+                        //desktop gestures
+                        onmousedown: (e)=>{
+                          views.mealList.startHold(e,meal.id);
+                        },
+                        onmouseup: (e)=>{
+                          views.mealList.cancelHold(e);
+                        },
+                        onmouseleave: (e)=>{
+                          views.mealList.cancelHold(e);
+                        },
+                        //on click
+                        onclick: async () =>{
+                          await navigate.toMealEdit(meal.id);
+                        }
+                      },[
+                      m(".mealName",meal.doc.name),
+                      m(navigateIcon)
+                    ]);
+                  }
+                }))
+              ])
+            })),
+            m("#unsortedList",[
+              m(".section",[
+                  m(".sectionTitle","Misc"),
+                  m(".sectionList",views.mealList.unsortedMeals.map((meal)=>{//loop through all unsorted recipes
+                    return m(".sectionMeal",{
+                        id: meal.id,
+                        //mobile gestures
+                        ontouchstart: (e)=>{
+                          views.mealList.startHold(e,meal.id);
+                        },
+                        ontouchend: (e)=>{
+                          views.mealList.cancelHold(e);
+                        },
+                        //desktop gestures
+                        onmousedown: (e)=>{
+                          views.mealList.startHold(e,meal.id);
+                        },
+                        onmouseup: (e)=>{
+                          views.mealList.cancelHold(e);
+                        },
+                        onmouseleave: (e)=>{
+                          views.mealList.cancelHold(e);
+                        },
+                        //on click
+                        onclick: async () =>{
+                          await navigate.toMealEdit(meal.id);
+                        }
+                      },[
+                      m(".mealName",meal.doc.name),
+                      m(navigateIcon)
+                    ]);
+                }))
               ])
             ])
-          }))
+          ])
         ] : m(".explainationText","Add some recipes to get started!"))//if there are no meals saved yet
       ])
     ])
@@ -170,7 +211,7 @@ var mealPlan = {
                 views.mealPlan.selectMeal(e,meal.id);
               }},[
                 m("div",meal.doc.name),
-                m(plusIcon,{class:"plusIcon"})
+                m(plusIconSmall,{class:"plusIcon"})
               ])
             })
           ])
