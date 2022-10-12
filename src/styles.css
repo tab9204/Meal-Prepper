@@ -96,7 +96,7 @@ mealPlan #pageContent{overflow-y: visible !important; padding: 0px !important;}
   mealPlan .pageSection {display: flex; flex-direction: column; height: 100%;}
     mealPlan .pageSection #selectList, mealPlan .pageSection #mealPlanList{overflow-y: scroll; position: relative;}
   mealPlan .menu {background: #86CB92;}
-  mealPlan .checkBtn{position: relative;left: 50%; transform: translateX(-50%); width: 65%; font-size: 1em !important; word-break: break-all;}
+  mealPlan .checkBtn{position: relative;left: 50%; transform: translateX(-50%); width: 65%; font-size: 1em !important; word-break: break-word;}
     mealPlan #main .checkBtn{background: #86CB92;}
       mealPlan #main .checkBtn div:nth-child(1){border-right: 1px solid; padding: 0 5px 0 10px; min-width:55px;}
       mealPlan #main .checkBtn div:nth-child(2){margin-left: 20px;}
