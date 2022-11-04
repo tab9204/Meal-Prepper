@@ -41,7 +41,7 @@ var navBar = {
     return m(".navBar",[
       m(".navBtnContainer",[
         m(shoppingCartIcon,{
-          class: "btnImage",
+          class: "btnImage navIcon",
           id: "toMealPlan",
           click: async (e)=>{
             //add the pulse animation
@@ -53,7 +53,7 @@ var navBar = {
       ]),
       m(".navBtnContainer",[
         m(home,{
-          class: "btnImage",
+          class: "btnImage navIcon",
           id: "toMealList",
           click: async (e)=>{
             //add the pulse animation
@@ -65,7 +65,7 @@ var navBar = {
       ]),
       m(".navBtnContainer",[
         m(plusIcon,{
-          class: "btnImage",
+          class: "btnImage navIcon",
           id: "toMealEdit",
           click: async (e)=>{
             //add the pulse animation
@@ -146,6 +146,16 @@ var checkIcon = {
     ])
   }
 }
+//small checkmark svg icon
+var checkIconSmall = {
+  view: (vnode)=>{
+    return m(".icon",{class:vnode.attrs.class, id:vnode.attrs.id, onclick: async ()=>{
+      await vnode.attrs.click();
+    }},[
+      m.trust('<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20"><path d="m8.229 14.062-3.521-3.541L5.75 9.479l2.479 2.459 6.021-6L15.292 7Z"/></svg>')
+    ])
+  }
+}
 //navigation arrow svg icon
 var navigateIcon = {
   view: (vnode)=>{
@@ -159,13 +169,24 @@ var navigateIcon = {
   }
 }
 
-//shopping card svg icon
+//shopping cart svg icon
 var shoppingCartIcon = {
   view: (vnode)=>{
     return m(".icon",{class:vnode.attrs.class, id:vnode.attrs.id, onclick: async (e)=>{
       await vnode.attrs.click(e);
     }},[
       m.trust('<svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M23.25 17.35V11.2h-6.2v-3h6.2V2.05h3V8.2h6.15v3h-6.15v6.15ZM14.5 44q-1.5 0-2.55-1.05-1.05-1.05-1.05-2.55 0-1.5 1.05-2.55Q13 36.8 14.5 36.8q1.5 0 2.55 1.05 1.05 1.05 1.05 2.55 0 1.5-1.05 2.55Q16 44 14.5 44Zm20.2 0q-1.5 0-2.55-1.05-1.05-1.05-1.05-2.55 0-1.5 1.05-2.55 1.05-1.05 2.55-1.05 1.5 0 2.55 1.05 1.05 1.05 1.05 2.55 0 1.5-1.05 2.55Q36.2 44 34.7 44ZM14.5 33.65q-2.1 0-3.075-1.7-.975-1.7.025-3.45l3.05-5.55L7 7H3.1V4h5.8l8.5 18.2H32l7.8-14 2.6 1.4-7.65 13.85q-.45.85-1.225 1.3-.775.45-1.825.45h-15l-3.1 5.45h24.7v3Z"/></svg>')
+    ])
+  }
+}
+
+//delete shopping cart svg icon
+var deleteShoppingCartIcon = {
+  view: (vnode)=>{
+    return m(".icon",{class:vnode.attrs.class, id:vnode.attrs.id, onclick: async (e)=>{
+      await vnode.attrs.click(e);
+    }},[
+      m.trust('<svg xmlns="http://www.w3.org/2000/svg" height="48" width="48"><path d="M32 25.4h-1.75l-2.95-3h4.25l6.3-11.4H15.8l-3-3h26.45q1.3 0 1.9 1.075.6 1.075-.1 2.325L34 24.2q-.3.55-.75.875-.45.325-1.25.325ZM14.35 43.95q-1.5 0-2.55-1.05-1.05-1.05-1.05-2.55 0-1.5 1.05-2.55 1.05-1.05 2.55-1.05 1.5 0 2.55 1.05 1.05 1.05 1.05 2.55 0 1.5-1.05 2.55-1.05 1.05-2.55 1.05Zm28.2 2.3-12.8-12.7h-15.9q-1.9 0-2.8-1.375-.9-1.375.05-2.975l3.5-5.85L10.3 14l-8-8 2.15-2.15L44.7 44.1Zm-15.8-15.7-5.05-5.2h-4.75l-3.15 5.2Zm4.8-8.15H27.3h4.25Zm2.85 21.55q-1.45 0-2.525-1.05T30.8 40.35q0-1.5 1.075-2.55 1.075-1.05 2.525-1.05t2.525 1.05Q38 38.85 38 40.35q0 1.5-1.075 2.55-1.075 1.05-2.525 1.05Z"/></svg>')
     ])
   }
 }
@@ -183,4 +204,4 @@ var menuIcon = {
   }
 }
 
-export{lightBox,loadingImg,navBar,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon,plusIconSmall};
+export{lightBox,loadingImg,navBar,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon,plusIconSmall,checkIconSmall};

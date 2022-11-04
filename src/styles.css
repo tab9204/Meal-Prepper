@@ -7,11 +7,12 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 ::-webkit-scrollbar {width: 0px;}
 .navBtn{width: 50px; height: 50px;}
 .explainationText {font-size: 1.1em; padding:5px;}
+:root {--blue: #4281A4; --grey: #e0dede; --white: #faf9f6;}
 
 /*app structure styles*/
 #appRoot{height: 100%;display: flex; flex-direction: column; box-sizing: border-box; padding-top: 50px;}
   #pageRoot{height: 100%}
-    #pageContainer{height: 100%; display: flex; flex-direction: column; background: #faf9f6; width: 100%;}
+    #pageContainer{height: 100%; display: flex; flex-direction: column; background: var(--white); width: 100%;}
       #pageContent{padding: 8px; overflow-y: scroll; max-width: 640px; position: relative; left: 50%; transform: translateX(-50%); height: 100%;}
   #navRoot{display: flex; margin-top: -50px;}
 
@@ -19,13 +20,13 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
 .lightBoxContainer.closed{display: none !important;}
 .lightBoxContainer.open{display: block !important;}
   .lightBoxBackground{position: fixed; background: black; z-index: 3; opacity: .6; width: 100%; height: 100%;}
-  .lightBox{position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: #4281A4; border: 1px solid black; width: 80%; max-width: 640px; padding: 10px; z-index: 4; font-size: 1.2em;}
-    .lightBox .lightboxText{margin-bottom: 15px;}
+  .lightBox{position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: var(--blue); border: 1px solid black; width: 80%; max-width: 640px; padding: 10px; z-index: 4; font-size: 1.2em;}
+    .lightBox .lightboxText{margin-bottom: 15px; text-align: center;}
     .lightBoxButtons{display: flex; justify-content: space-around;}
-      .lightboxBtn{padding: 8px 10px; background: #86CB92; border:1px solid; border-radius: 5px; box-shadow: 0.25px 0.5px 0.5px black;}
+      .lightboxBtn{padding: 8px 10px; background: var(--grey);; border:1px solid; border-radius: 5px; box-shadow: 0.25px 0.5px 0.5px black;}
 
 /*navigation bar styles*/
-.navBar{justify-content: space-between; width: 100%; overflow: hidden; background: #4281A4; display: flex; z-index: 2; padding: 3px;}
+.navBar{justify-content: space-between; width: 100%; overflow: hidden; background: var(--blue);; display: flex; z-index: 2; padding: 3px;}
   .navBtnContainer{display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 25px; position: relative;}
     .navBtnContainer .icon{width:45px !important; height: 45px !important;}
   .btnBackground{width: 10px; height: 10px; background: white; transform-origin: center; border-radius: 20px; position: absolute;}
@@ -33,7 +34,7 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
     #toMealEdit {width: 45px !important; height: 45px !important;}
 
 /*pull to reload styles*/
-.reload{position: absolute; background: #faf9f6; border: 1px solid; border-radius: 40px; bottom: -42px; left: 50%; transform: translateX(-50%);}
+.reload{position: absolute; background: var(--white); border: 1px solid; border-radius: 40px; bottom: -42px; left: 50%; transform: translateX(-50%);}
   .reload img{width: 40px;}
 
 /*button styles*/
@@ -44,25 +45,25 @@ body{margin: 0px; font-family: 'Work Sans', sans-serif; overscroll-behavior-y: c
   .checkBtn img{ width: 20px; height: 20px; margin-left: 7px;}
 /*toggle button*/
 .toggle{display: flex; justify-content: space-evenly;}
-  .toggleBtn{padding: 7px; margin: 5px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
+  .toggleBtn{padding: 7px; margin: 5px; border: 1px solid; text-align: center; background: var(--white); box-shadow: 0.25px 0.5px 0.5px black;}
     .toggleBtn.toggled{box-shadow: none;}
 /*menu button*/
 .menuBtn{ width: 35px; height: 40px; position: absolute; bottom: 0px; left: 0px; display: flex; flex-direction: column; justify-content: space-evenly;}
   .dot{width:8px; height:8px; background:black; border-radius:13px; align-self: center;}
 .menuBtn.disabled{opacity: .5;}
-.menu{display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 0px; left:0px; background: white; border: 1px solid; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 10px;}
-  .menu .menuIcon{width: 50px; z-index: 2; margin: 3px 3px 3px -2px;}
+.menu{display: flex; justify-content: space-between; flex-direction: column-reverse; position: absolute; bottom: 7px; right:7px; background: white; border: 1px solid; align-items: center; box-shadow: 0.5px 1px 1px black; transform-origin: bottom left; padding: 5px;}
+  .menu .menuIcon{width: 40px; z-index: 2;}
 
 /**view styles***/
 mealList #mealList{display: flex; flex-wrap: wrap; justify-content: center;}
   mealList .section{display: flex; flex-direction: column; margin: 5px 0; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
     mealList .section .sectionTitle{font-size: 1.3em; font-weight: bold; border-bottom: 2px solid;}
-      mealList .section .sectionList .sectionMeal{display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 5px; font-size: 1.2em; margin: 5px 0; border-radius: 5px; background: #e0dede; word-break: break-word;}
+      mealList .section .sectionList .sectionMeal{display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 10px 5px; font-size: 1.2em; margin: 5px 0; border-radius: 5px; background: var(--grey);; word-break: break-word;}
       mealList .section:has(> .sectionList:empty) {display: none;}
 
 /*mealOptions .pageSection{position: relative; transform: translate(-50%,-50%); left: 50%; top: 50%; display: flex; flex-direction: column; align-items: center;}*/
 mealOptions .pageSection{height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;}
-  mealOptions .pageSection .checkBtn{background: #86CB92; width: 80%; margin: 10px 0 !important; text-align: center;}
+  mealOptions .pageSection .checkBtn{background: var(--grey);; width: 80%; margin: 10px 0 !important; text-align: center;}
     mealOptions .pageSection .checkBtn div{width: 100%;}
 
 mealSelect #pageContent{padding: 0px !important;}
@@ -75,7 +76,7 @@ mealSelect #pageContent{padding: 0px !important;}
     mealSelect .toggle{margin-top: 5px;}
       mealSelect .toggleBtn{width: 105px;}
       mealSelect .toggleBtn.toggled{background: #86CB92;}
-    mealSelect .checkBtn{background: #86CB92; width: 80%; left: 50%; transform: translate(-50%); position: relative; justify-content: center;}
+    mealSelect .checkBtn{background: var(--grey);; width: 80%; left: 50%; transform: translate(-50%); position: relative; justify-content: center;}
     mealSelect .checkBtn.checked{color: grey; border: 1px solid grey !important; background: lightgrey;}
 
 
@@ -85,39 +86,43 @@ mealEdit .pageSection:nth-child(1) {border-bottom: 1px solid;}
 mealEdit .pageSection:nth-child(2), mealEdit .pageSection:nth-child(3){height: 100%; overflow-y: hidden; display: flex; flex-direction: column;}
 mealEdit .pageSection {margin: 5px;}
   mealEdit #toggle{width: 100%; display: flex; justify-content: space-evenly; margin-top: 5px;}
-    mealEdit .toggleBtn{width: 105px; padding: 9px; margin: 5px; border: 1px solid; text-align: center; background: #faf9f6; box-shadow: 0.25px 0.5px 0.5px black;}
-    mealEdit .toggleBtn.toggled{background: #86CB92; box-shadow: none;}
+    mealEdit .toggleBtn{width: 105px; padding: 9px; margin: 5px; border: 1px solid; text-align: center; background: var(--grey); box-shadow: 0.25px 0.5px 0.5px black;}
+    mealEdit .toggleBtn.toggled{background: var(--blue);; box-shadow: none;}
   mealEdit .pageSection #name {font-size: 1.2em;}
-  mealEdit textarea, mealEdit input{resize: none; width: 100%; height: 100%; padding: 5px 0; border:none; overflow-y: scroll; background: #faf9f6;}
+  mealEdit textarea, mealEdit input{resize: none; width: 100%; height: 100%; padding: 5px 0; border:none; overflow-y: scroll; background: var(--white);}
   mealEdit textarea:focus, mealEdit input:focus{outline: none;}
 
 
 mealPlan #pageContent{overflow-y: visible !important; padding: 0px !important;}
   mealPlan .pageSection {display: flex; flex-direction: column; height: 100%;}
     mealPlan .pageSection #selectList, mealPlan .pageSection #mealPlanList{overflow-y: scroll; position: relative;}
-  mealPlan .menu {background: #86CB92;}
+  mealPlan .menu {background: var(--grey);; border-radius: 36px;}
   mealPlan .checkBtn{position: relative;left: 50%; transform: translateX(-50%); width: 65%; font-size: 1em !important; word-break: break-word;}
     mealPlan #main .checkBtn{background: #86CB92;}
       mealPlan #main .checkBtn div:nth-child(1){border-right: 1px solid; padding: 0 5px 0 10px; min-width:55px;}
       mealPlan #main .checkBtn div:nth-child(2){margin-left: 20px;}
       mealPlan #main .checkBtn.checked{color: grey; border: 1px solid grey !important; background: lightgrey;}
-    mealPlan #select .checkBtn{background:lightgrey; justify-content: space-between;}
+    mealPlan #select .checkBtn{background:var(--grey);; justify-content: space-between;}
       mealPlan #select .checkBtn div{width:85%;}
       mealPlan #select .checkBtn .img{background-image: url("../assets/plus.png"); background-size: contain;}
-      mealPlan #select .checkBtn.checked{color: black; background: #86CB92;}
+      mealPlan #select .checkBtn.checked{color: black; background: var(--blue);;}
       mealPlan #select .checkBtn.checked .plusIcon{opacity: 0;}
       mealPlan #select .checkBtn .plusIcon{width: 20px; height: 20px; margin-left: 7px;}
 
-shoppingList .menu {background: #86CB92;}
-shoppingList #shoppingList{margin: 0px auto; max-width: 330px; width: 80%;}
+shoppingList .menu {background: var(--grey);; border-radius: 36px;}
+shoppingList #shoppingList{margin: 0px auto;}
   shoppingList .shoppingListMeal{padding: 8px 5px;}
     shoppingList .nameContainer{border-bottom: 1px solid; display: flex; justify-content: space-between;}
     shoppingList .mealName{font-size: 1.4em;}
     shoppingList .mealRepeat{margin: 5px 0;}
-    shoppingList .mealIngredient{font-size: 1.2em; margin: 5px 0; padding: 5px 0; display: list-item; list-style-type: disc; list-style-position: outside; margin-left: 20px; word-break: break-word;}
-    shoppingList .mealIngredient.checked{text-decoration: line-through; color: #a6a6a6;}
+    shoppingList .mealIngredient{font-size: 1em; margin: 7px 0; padding: 7px 0; display: flex;  word-break: break-word;}
+      shoppingList .checkBox{min-width: 20px; min-height: 20px; border:1px solid; border-radius: 5px; align-self: center; margin-right: 10px;}
+        shoppingList .checkBox .checkIcon{display: none;}
+    shoppingList .mealIngredient.checked .ingredientName{text-decoration: line-through; color: #9e9e9e;}
+    shoppingList .mealIngredient.checked .checkBox {background: #4281A4;}
+      shoppingList .mealIngredient.checked .checkBox .checkIcon{display: initial;}
 
-loadingScreen #loadingImg{z-index: 2; background: #faf9f6; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);}
+loadingScreen #loadingImg{z-index: 2; background: var(--white); position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);}
 loadingScreen #toMealPlan{pointer-events: none !important;}
 loadingScreen #toMealList{pointer-events: none !important;}
 loadingScreen #toMealEdit{pointer-events: none !important;}

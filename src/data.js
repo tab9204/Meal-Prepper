@@ -444,26 +444,16 @@ var views = {
     //selects a meal for the meal plan
     //e => element the triggered the the event
     // id => id of the meal being selected
-    selectMeal: async(e,id)=>{
+    selectMeal: async(e)=>{
       //toggle the checked class
       e.currentTarget.classList.toggle("checked");
-      //if the meal is now checked att it to the selected array
-      if(e.currentTarget.classList.contains("checked")){
-        views.mealPlan.selectedMeals.push(id);
-      }
-      //the meal is being deselected so remove it from the array
-      else{
-        views.mealPlan.selectedMeals = views.mealPlan.selectedMeals.filter((i)=>{
-          return i !== id;
-        })
-      }
       //check if the create meal plan button should be enabled
       //if there is at least 1 item in the selected array enable the button
-      if(views.mealPlan.selectedMeals.length >= 1){
-        document.querySelector("#selectMenu").classList.remove("hidden");
+      if(document.querySelectorAll(".checkBtn.checked").length >= 1){
+        document.querySelector(".menu").classList.remove("hidden");
       }
       else{
-        document.querySelector("#selectMenu").classList.add("hidden");
+        document.querySelector(".menu").classList.add("hidden");
       }
     },
     //variables and functions for oversrolling the meal list
@@ -556,14 +546,14 @@ var views = {
       views.shoppingList.list = shoppingList;
     },
     //adds or removes an ingredient from the checkedIngredients array
-    //e => element that was clicked
+    //e => element that should have the checked class on it
     //name => name of the ingredient
     //id => the meal id that the ingredient is part of
     checkOffIngredient: async (e,name,id)=>{
       //toggle the checked class on the button's parent element
-      e.currentTarget.classList.toggle("checked");
+      e.classList.toggle("checked");
       //determine if the ingredient is being checked or unchecked
-      var checked = e.currentTarget.classList.contains("checked");
+      var checked = e.classList.contains("checked");
       //get the meal entry from the db
       var meal = await database.get(database.meals,id);
       //if the checked array is undefined it should be an empty array
@@ -585,7 +575,7 @@ var views = {
     },
     lightBox: {
       id: "shoppingListLightbox",
-      text: "Delete this shopping list and start a new one?",
+      text: "Delete this shopping list?",
       buttons: [
         {
           click: async (vnode)=>{

@@ -1,7 +1,7 @@
 /*****app views****/
 import {database} from './database.js';
 import {navigate,views,utilities} from './data.js'
-import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon,plusIconSmall} from './components.js'
+import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon,plusIconSmall,checkIconSmall} from './components.js'
 
 
 //lists out all meals saved in the db
@@ -208,7 +208,7 @@ var mealPlan = {
           m("#selectList.planList",[
             views.mealPlan.savedMeals.map((meal)=>{
               return m(".checkBtn", {meal_id: meal.id, onclick: (e)=>{
-                views.mealPlan.selectMeal(e,meal.id);
+                views.mealPlan.selectMeal(e);
               }},[
                 m("div",meal.doc.name),
                 m(plusIconSmall,{class:"plusIcon"})
@@ -217,14 +217,20 @@ var mealPlan = {
           ])
         ] : m(".explainationText","You must add some recipes before you can create a shopping list"))//there are no meals saved yet
       ]),
-      m(checkIcon,{
-        id: "selectMenu",
-        class: "menuBtn hidden",
-        click: () =>{
-          //use the selected meals to create the meal plan
-          views.mealPlan.createPlan(views.mealPlan.selectedMeals);
-        }
-      })
+      m(".menu .hidden",[
+        m(checkIcon,{
+          class: "menuIcon",
+          click: ()=>{
+            //get all checked buttons
+            document.querySelectorAll(".checkBtn.checked").forEach((item, i) => {
+              //add the meal id of each checked button to the selected meals array
+              views.mealPlan.selectedMeals.push(item.attributes.meal_id.value);
+            });
+            //use the selected meals to create the meal plan
+            views.mealPlan.createPlan(views.mealPlan.selectedMeals);
+          }
+        })
+      ])
     ])
   }
 }
@@ -262,10 +268,7 @@ var shoppingList = {
         buttons: views.shoppingList.lightBox.buttons,
         vnode: vnode
       }),
-      m("#pageContent",{onmousedown: ()=>{//mouse down on anywhere on the page
-          //close the secondary menu
-          document.getElementsByClassName("menu")[0].classList.add("hidden");
-      }},[
+      m("#pageContent",[
         m("#list.pageSection",[
           m("#shoppingList",views.shoppingList.list.length >= 1 ? views.shoppingList.list.map((item,i)=>{//if there is at least 1 meal on the shopping list
             return m(".shoppingListMeal",{item_id: item.meal_id, repeat: item.repeat},[
@@ -273,16 +276,23 @@ var shoppingList = {
                 m(".mealName",item.name == "" ? "Nameless Meal" : item.name)//add a default name if the meal does not have one
               ]),
               item.ingredients.length >= 1 ? item.ingredients.map((ingredient,i)=>{//if the meal has at least 1 ingredient
-                return m(".mealIngredient",{class: item.checked.includes(ingredient) ? "checked" : "", onclick: async (e)=>{
-                  await views.shoppingList.checkOffIngredient(e,ingredient,item.meal_id);
-                }},ingredient)
+                return m(".mealIngredient",{class: item.checked.includes(ingredient) ? "checked" : ""},[
+                  m(".checkBox",{onclick: async (e)=>{
+                    //get the parent element as that is the element we want to place the checked class on
+                    var element = e.currentTarget.parentElement;
+                    //check off ingredient
+                    await views.shoppingList.checkOffIngredient(element,ingredient,item.meal_id);
+                  }},[
+                    m(checkIconSmall,{class:"checkIcon"})
+                  ]),
+                  m(".ingredientName",ingredient)
+                ])
               }) : "No ingredients needed"//the recipe has no ingredients listed
             ])
           }) : "Nothing to shop for")//there are no meals on the shopping list
         ])
       ]),
-      m(menuIcon),
-      m(".menu.hidden.scaleUp",[
+      m(".menu",[
         m(trashCan,{
           class: "menuIcon",
           click: ()=>{
