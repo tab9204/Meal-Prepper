@@ -531,7 +531,7 @@ var views = {
         var checked = meal.checked == undefined ? [] : meal.checked;
         //convert the ingredients string into an array
         //filter out any blank strings as we want to ignore those
-        var strToArry = meal.ingredients.split("\n").filter(ingredient => ingredient);
+        var strToArry = meal.ingredients.split("\n").filter(ingredient => ingredient.trim().length > 0);
         var ingredients = strToArry.length >= 1 ? strToArry : [];
         //object containing all the meal data needed to shop for this meal
         var addToList = {meal_id: meal._id, name: meal.name, ingredients: ingredients, checked: checked};
