@@ -241,12 +241,12 @@ var mealOptions = {
     return m("mealOptions#pageContainer",[
       m("#pageContent",[
         m(".pageSection",[
-          m(".checkBtn",{ onclick: async ()=>{
+          m(".fullScreenBtn",{ onclick: async ()=>{
             await navigate.toMealEdit(undefined);
           }},[
            m("div", "Add your own recipe")
          ]),
-          m(".checkBtn",{onclick: async ()=>{
+          m(".fullScreenBtn",{onclick: async ()=>{
             await navigate.toLoadingScreen("recipe");
           }}, [
            m("div", "Find a recipe")
