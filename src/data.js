@@ -10,11 +10,17 @@ var navigate = {
     //route to the meal plan view passing along all the meals
     m.route.set('/list');
   },
-  //navigates to the meal edit view
+  //navigates to the meal view screen
+  //id => the id of the meal to display
+  toMealView: async (id)=>{
+    //init the view
+    await views.mealView.initalize(id);
+    m.route.set('/view');
+  },
+  //navigates to the meal edit screen
   //id => the id of the meal to display for editing
   toMealEdit: async (id)=>{
     await views.mealEdit.initalize(id);
-    //route to the edit view passing the rendering vars
     m.route.set('/edit');
   },
   //navigates to the meal plan view
@@ -71,35 +77,24 @@ var navigate = {
 //view specific data, functions and events
 var views = {
   mealList: {
-    lightBox: {
+    popup: {
       meal_id: null, //the id of the meal that should be deleted if the user selects delete
-      id: "mealListLightBox",
-      text: "Delete this meal?",
-      buttons: [
-        {
-          click: async (vnode)=>{
-            //delete the selected recipe from the db
-            await database.delete(database.meals,views.mealList.lightBox.meal_id);
-            //delete the meal from the meal plan if it is on it
-            var meal = await database.get(database.mealPlan,views.mealList.lightBox.meal_id);
-            if(meal !== ""){
-              await database.delete(database.mealPlan,views.mealList.lightBox.meal_id);
-            }
-            //reload the meal list page by navigating back to it
-            await navigate.toMealList();
-            //close the lightbox
-            utilities.lightBox.close(views.mealList.lightBox.id);
-          },
-          text: "Delete"
-        },
-        {
-          click: (vnode) =>{
-            //close the lightbox
-            utilities.lightBox.close(views.mealList.lightBox.id);
-          },
-          text: "Cancel"
+      delete: async ()=>{
+        //delete the selected recipe from the db
+        await database.delete(database.meals,views.mealList.popup.meal_id);
+        //delete the meal from the meal plan if it is on it
+        var meal = await database.get(database.mealPlan,views.mealList.popup.meal_id);
+        if(meal !== ""){
+          await database.delete(database.mealPlan,views.mealList.popup.meal_id);
         }
-      ]
+        //reload the meal list page by navigating back to it
+        await navigate.toMealList();
+        //close the lightbox
+        utilities.popup.close();
+      },
+      edit: async ()=>{
+        await navigate.toMealEdit(views.mealList.popup.meal_id);
+      }
     },
     allMeals: [],//array containg the meal data needed to render the view
     allowedChracters:[],//the chracters allowed when sorting meals
@@ -123,6 +118,11 @@ var views = {
         //the char code of the first character in the meal name
         var firstCharCode = meal.doc.name.charAt(0).toUpperCase().charCodeAt(0);
         if(firstCharCode < 65 || firstCharCode > 90){
+          views.mealList.unsortedMeals.push(meal);
+        }
+        //check if the name is blank and then add a name
+        if(meal.doc.name == ""){
+          meal.doc.name = "?????";
           views.mealList.unsortedMeals.push(meal);
         }
       });
@@ -190,37 +190,44 @@ var views = {
     },
     //timeout function for the go btn hold gesture
     holdTimeout: null,
+    touchX:null,
+    touchY: null,
     //starts a go btn hold gesture
     //e => the event that triggered the hold
     //id => the id of the meal from the btn the user pressed
     startHold: (e,id)=>{
-      console.log("start hold");
       //clear the hold timeout function
       clearTimeout(views.mealList.holdTimeout);
+      //set the touch x and y to where the user has placed their finger
+      var touchX = e.touches[0].clientX;
+      var touchY = e.touches[0].clientY;
       //set a new timeout
-      //run the hold function after 1 second of holding
+      //run the hold function after .750 seconds of holding
       views.mealList.holdTimeout = setTimeout(()=>{
-        navigator.vibrate(100);
-        //set the meal id for the lightbox so we delete the correct meal
-        views.mealList.lightBox.meal_id = id;
-        //add the held class to the btn that was held down
-      //  e.target.classList.add("held");
-        //open the lightbox
-        setTimeout(()=>{utilities.lightBox.open("mealListLightBox")},100);
-        console.log("held");
-      },1500);
+        //set the meal id for the popup menu so we delete the correct meal
+        views.mealList.popup.meal_id = id;
+        //get the screen width and height
+        var screenWidth = window.innerWidth;
+        var screenHeight = window.innerHeight;
+        //popup menu element so we can use its width and height
+        var popup = document.querySelector("#popupMenu");
+        //calculate the x and y of the popup menu
+        var offsetX = touchX <= screenWidth / 2 ? 30 : (popup.offsetWidth + 30) * -1;
+        var offsetY = touchY <= screenHeight / 2 ? 30 : (popup.offsetHeight + 30) * -1;
+        var x = touchX + offsetX;
+        var y = touchY + offsetY;
+
+        utilities.popup.open(popup,x,y);
+
+      },600);
     },
     //stops a go btn hold gesture
     cancelHold: (e)=>{
-      console.log("end hold");
       //e.target.classList.remove("held");
       clearTimeout(views.mealList.holdTimeout);
     }
-
   },
-  mealEdit:{
-    //reference to the setTimout function
-    timeout: null,
+  mealView:{
     //the meal data the view needs to render
     meal: {
       id:null,
@@ -229,9 +236,33 @@ var views = {
       directions:null,
       checked:null
     },
+    //id => the id of the meal to display for editing
+    initalize: async (id)=>{
+      //get the meal data from the db
+      var meal = await database.get(database.meals,id);
+      //set the rendering vars to the meal data from the db
+      views.mealView.meal.id = id;
+      views.mealView.meal.name = meal.name;
+      views.mealView.meal.ingredients = meal.ingredients.trim().split(/\r?\n/);//split the ingredients string on each new line
+      views.mealView.meal.directions = meal.directions.trim().split(/\r?\n/);
+      views.mealView.meal.checked = meal.checked !== undefined ? meal.checked : [];
+      //since this is an existing meal we are editing the mobile keyboard should not automatically show
+      views.mealView.autoFocus = false;
+    }
+  },
+  mealEdit: {
+    //the meal data of the currently edited meal
+    meal: {
+      id:'',
+      name:'',
+      ingredients:[],
+      directions:[],
+      checked:[]
+    },
     //boolean for if the text input should automatically focus on page render
     autoFocus:false,
-    //id => the id of the meal to display for editing
+    //reference to the setTimout function
+    timeout: null,
     initalize: async (id)=>{
       //if the id is not undefined we are editing an existing meal
       if(id !== undefined){
@@ -240,8 +271,8 @@ var views = {
         //set the rendering vars to the meal data from the db
         views.mealEdit.meal.id = id;
         views.mealEdit.meal.name = meal.name;
-        views.mealEdit.meal.ingredients = meal.ingredients;
-        views.mealEdit.meal.directions = meal.directions;
+        views.mealEdit.meal.ingredients = meal.ingredients.trim();
+        views.mealEdit.meal.directions = meal.directions.trim();
         views.mealEdit.meal.checked = meal.checked !== undefined ? meal.checked : [];
         //since this is an existing meal we are editing the mobile keyboard should not automatically show
         views.mealEdit.autoFocus = false;
@@ -252,35 +283,36 @@ var views = {
         var new_id = '' + Date.now();
         //rendering vars default to empty
         views.mealEdit.meal.id = new_id;
-        views.mealEdit.meal.name = '';
-        views.mealEdit.meal.ingredients = '';
-        views.mealEdit.meal.directions = '';
+        views.mealEdit.meal.name = "";
+        views.mealEdit.meal.ingredients = "";
+        views.mealEdit.meal.directions = "";
         views.mealEdit.meal.checked = []
         //new meal so mobile keyboard should auto show
         views.mealEdit.autoFocus = true;
       }
     },
-    //on input change
-    //e => event data
-    //id => id of the meal being edited
-    //checked => the checked ingredients array for the meal
-    onChange: (e,id,checked)=>{
-      //prevent mithril from redrawing the view
-      //if we did not do this the text in the textarea would be removed
-      e.redraw = false;
+    //saves the current meal data to the db
+    saveMeal: ()=>{
       //clear any exising setTimout functions
       clearTimeout(views.mealEdit.timeout);
       //create a new setTimeout
       views.mealEdit.timeout = setTimeout(async () => {
-        //get the text in each textarea input
-        var name = document.getElementById("name").value;
-        var ingredients = document.getElementById("ingredients").value;
-        var directions = document.getElementById("directions").value;
-        //meal data object with the values from the textareas
+        //gather the meal data we want to save to the db
+        var id = views.mealEdit.meal.id;
+        var checked = views.mealEdit.meal.checked;
+        var name = document.querySelector("#name").value.trim();
+        var ingredients = document.querySelector("#ingredients").value.trim();
+        var directions = document.querySelector("#directions").value.trim();
+        //the data object we are saving to the db
         var data = {name: name, ingredients: ingredients, directions: directions, checked: checked};
+        //check if there is at least a name, ingredients or directions
+        //if the data lacks all of those we don't want to save the new entry
+        if(name == "" && ingredients == "" && directions == ""){
+          return;
+        }
         //check if this meal already exists in the db or is brand new
         var meal = await database.get(database.meals,id);
-        //if the meal is not blank then it already exits in the db and we can update it
+        //if the meal is not blank then it already exists in the db and we can update it
         if(meal !== ""){
           await database.update(database.meals,id,data);
         }
@@ -573,29 +605,20 @@ var views = {
       var update = {name: meal.name, ingredients:meal.ingredients, directions:meal.directions, checked: meal.checked};
       await database.update(database.meals,meal._id,update);
     },
-    lightBox: {
-      id: "shoppingListLightbox",
-      text: "Delete this shopping list?",
-      buttons: [
-        {
-          click: async (vnode)=>{
-            //delete the meal plan
-            await views.mealPlan.deletePlan();
-            //empty the shopping list
-            views.shoppingList.list = [];
-            //route to the meal plan view
-            await navigate.toMealPlan();
-          },
-          text: "Delete"
-        },
-        {
-          click: (vnode) =>{
-            utilities.lightBox.close("shoppingListLightbox");
-          },
-          text: "Cancel"
-        }
-      ]
-    },
+    popup: {
+      meal_id: null, //the id of the meal that should be deleted if the user selects delete
+      delete: async ()=>{
+        //delete the meal plan
+        await views.mealPlan.deletePlan();
+        //empty the shopping list
+        views.shoppingList.list = [];
+        //route to the meal plan view
+        await navigate.toMealPlan();
+      },
+      cancel: async ()=>{
+        utilities.popup.close();
+      }
+    }
   }
 }
 
@@ -632,6 +655,24 @@ const utilities ={
         lightBox.classList.add("closed");
       }
       catch(e){console.log("No lightbox on this view");}
+    }
+  },
+  //functions to open and close the popup menu
+  popup: {
+    //element => the popup html element
+    //x,t => the coordinates of where the menu should open
+    open: (element,x,y)=>{
+      //set the x and y of the popup menu
+      element.style.left = x + "px";
+      element.style.top = y + "px";
+      //show the menu on screen and add the scale up animation
+      element.classList.remove("invisible");
+      element.classList.add("scaleUp");
+    },
+    close: ()=>{
+      var popup = document.querySelector("#popupMenu");
+      popup.classList.add("invisible");
+      popup.classList.remove("scaleUp");
     }
   },
   //functions for the navigation bar

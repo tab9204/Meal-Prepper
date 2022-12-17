@@ -1,7 +1,22 @@
 /*****app views****/
 import {database} from './database.js';
 import {navigate,views,utilities} from './data.js'
-import {lightBox,loadingImg,pullToReload,trashCan,menuIcon,checkIcon,navigateIcon,shoppingCartIcon,plusIcon,plusIconSmall,checkIconSmall} from './components.js'
+import {
+  loadingImg,
+  pullToReload,
+  trashCan,
+  checkIcon,
+  navigateIcon,
+  shoppingCartIcon,
+  plusIcon,
+  plusIconSmall,
+  checkIconSmall,
+  popupMenu,
+  editIcon,
+  confirmIcon,
+  cancelIcon
+} from './components.js'
+
 
 
 //lists out all meals saved in the db
@@ -18,12 +33,14 @@ var mealList = {
   },
   view: (vnode)=>{
     return m("mealList#pageContainer",[
-      m(lightBox,{//delete the current meal
-        id:  views.mealList.lightBox.id,
-        text:  views.mealList.lightBox.text,
-        buttons: views.mealList.lightBox.buttons
-      }),
-      m("#pageContent",{onscroll: (e)=> {views.mealList.cancelHold(e);}},[//when the view scrolls cancel the delete hold timer
+      m(popupMenu,[
+        m(editIcon,{onclick:(e)=>{views.mealList.popup.edit();}}),
+        m(trashCan,{onclick:(e)=>{views.mealList.popup.delete();}})
+      ]),
+      m("#pageContent",{
+        ontouchstart:()=>{utilities.popup.close()},//when the user clicks here the popup should close
+        onscroll: (e)=> {views.mealList.cancelHold(e);}//when the view scrolls cancel the delete hold timer
+      },[
         m(".pageSection", views.mealList.allMeals.length >= 1 ? [//if there is at least 1 meal already saved
           m("#recipeList",[
             m("#sortedList",views.mealList.allowedChracters.map((c)=>{//loop through all allowed catagory characters
@@ -48,11 +65,11 @@ var mealList = {
                           views.mealList.cancelHold(e);
                         },
                         onmouseleave: (e)=>{
-                          views.mealList.cancelHold(e);
+                          //views.mealList.cancelHold(e);
                         },
                         //on click
                         onclick: async () =>{
-                          await navigate.toMealEdit(meal.id);
+                          await navigate.toMealView(meal.id);
                         }
                       },[
                       m(".mealName",meal.doc.name),
@@ -87,7 +104,7 @@ var mealList = {
                         },
                         //on click
                         onclick: async () =>{
-                          await navigate.toMealEdit(meal.id);
+                          await navigate.toMealView(meal.id);
                         }
                       },[
                       m(".mealName",meal.doc.name),
@@ -103,7 +120,45 @@ var mealList = {
   }
 }
 
-//displays a meals info and allows for editing it
+//displays a meals ingredients and directions
+var mealView = {
+  view: (vnode)=>{
+    return m("mealView#pageContainer",[
+      m("#pageContent",[
+        m(".pageSection",[
+          m("#name",views.mealView.meal.name)
+        ]),
+        m(".pageSection.",[
+          m(".toggle",[
+            m("#toggleIngredients.toggleBtn.toggled",{onclick: (e)=>{
+              //prevent redraw as it will wipe all text from the fields
+              e.redraw = false;
+              //toggle this button, remove toggle from the other button, show the ingredients and hide the directions
+              e.currentTarget.classList.add("toggled");
+              document.getElementById("toggleDirections").classList.remove("toggled");
+              document.getElementById("ingredients").classList.remove("hidden");
+              document.getElementById("directions").classList.add("hidden");
+            }}, "Ingredients"),
+            m("#toggleDirections.toggleBtn",{onclick: (e)=>{
+              e.redraw = false;
+              e.currentTarget.classList.add("toggled");
+              document.getElementById("toggleIngredients").classList.remove("toggled");
+              document.getElementById("directions").classList.remove("hidden");
+              document.getElementById("ingredients").classList.add("hidden");
+            }}, "Directions")
+          ]),
+          m("#ingredients",views.mealView.meal.ingredients.map((ingredient)=>{
+            return m(".ingredient",ingredient)
+          })),
+          m("#directions.hidden",views.mealView.meal.directions.map((direction)=>{
+            return m(".direction",direction)
+          }))
+        ])
+      ])
+    ])
+  }
+}
+
 var mealEdit = {
   oncreate: (vnode)=>{
     if(views.mealEdit.autoFocus){
@@ -115,7 +170,10 @@ var mealEdit = {
       m("#pageContent",[
         m(".pageSection",[
           m("input#name",{placeholder: "What is the name of this meal?", value: views.mealEdit.meal.name,  type: "text", oninput: (e)=>{
-            views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
+            //prevent mithril from redrawing the view
+            //if we did not do this the text in the textarea would be removed
+            e.redraw = false;
+            views.mealEdit.saveMeal();
           }})
         ]),
         m(".pageSection.",[
@@ -137,13 +195,15 @@ var mealEdit = {
               document.getElementById("ingredients").classList.add("hidden");
             }}, "Directions")
           ]),
-          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.\n\nSeparate individual ingredients with line breaks.\n\nAny ingredients placed here will be used when creating your shopping list.", oninput: (e)=>{
-            views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
+          m("textarea#ingredients",{placeholder: "Add ingredients for the meal here.", oninput: (e)=>{
+            e.redraw = false;
+            views.mealEdit.saveMeal();
           }},views.mealEdit.meal.ingredients),
-          m("textarea#directions.hidden",{placeholder: "Add cooking instructions for the meal here.\n\nThis isn't required but is useful when cooking the meal.", oninput: (e)=>{
-            views.mealEdit.onChange(e,views.mealEdit.meal.id,views.mealEdit.meal.checked);
+          m("textarea#directions.hidden",{placeholder: "Add cooking instructions for the meal here.", oninput: (e)=>{
+            e.redraw = false;
+            views.mealEdit.saveMeal();
           }},views.mealEdit.meal.directions)
-        ]),
+        ])
       ])
     ])
   }
@@ -220,7 +280,7 @@ var mealPlan = {
       m(".menu .hidden",[
         m(checkIcon,{
           class: "menuIcon",
-          click: ()=>{
+          onclick: ()=>{
             //get all checked buttons
             document.querySelectorAll(".checkBtn.checked").forEach((item, i) => {
               //add the meal id of each checked button to the selected meals array
@@ -262,13 +322,11 @@ var mealOptions = {
 var shoppingList = {
   view: (vnode)=>{
     return m("shoppingList#pageContainer",[
-      m(lightBox,{//delete the current shopping list
-        id: views.shoppingList.lightBox.id,
-        text: views.shoppingList.lightBox.text,
-        buttons: views.shoppingList.lightBox.buttons,
-        vnode: vnode
-      }),
-      m("#pageContent",[
+      m(popupMenu,[
+        m(confirmIcon,{onclick:(e)=>{views.shoppingList.popup.delete();}}),
+        m(cancelIcon,{onclick:(e)=>{views.shoppingList.popup.cancel();}})
+      ]),
+      m("#pageContent",{ontouchstart:()=>{utilities.popup.close()}},[
         m("#list.pageSection",[
           m("#shoppingList",views.shoppingList.list.length >= 1 ? views.shoppingList.list.map((item,i)=>{//if there is at least 1 meal on the shopping list
             return m(".shoppingListMeal",{item_id: item.meal_id, repeat: item.repeat},[
@@ -295,8 +353,9 @@ var shoppingList = {
       m(".menu",[
         m(trashCan,{
           class: "menuIcon",
-          click: ()=>{
-            utilities.lightBox.open("shoppingListLightbox");
+          onclick: ()=>{
+            var popup = document.querySelector("#popupMenu");
+            utilities.popup.open(popup,window.innerWidth - (popup.offsetWidth + 7) ,window.innerHeight - (popup.offsetHeight + 70));
           }
         })
       ])
@@ -309,6 +368,9 @@ var loadingScreen = {
   oninit: async (vnode)=>{
     //disable the nav buttons so the user cannot navigate away during the animation load
     utilities.navBar.disable();
+
+  },
+  oncreate: async (vnode)=>{
     try{
       //check the load variable to see what steps to take during loading
       //meal plan load
@@ -359,4 +421,4 @@ var loadingScreen = {
 }
 
 
-export{mealList,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect};
+export{mealList,mealView,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect};

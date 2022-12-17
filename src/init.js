@@ -1,6 +1,6 @@
 //********Initalization script that starts the app*****//
 //import views and the mithril library
-import {mealList,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect} from './views.js';
+import {mealList,mealView,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect} from './views.js';
 import {navigate} from './data.js'
 import {navBar} from './components.js'
 import "../libraries/mithril.min.js";
@@ -26,12 +26,13 @@ window.onload = async () =>{
   var pageRoot = document.getElementById("pageRoot");
   //set up the app routes
   m.route(pageRoot, "/list",{
-    "/list": mealList,
-    "/edit": mealEdit,
-    "/plan": mealPlan,
-    "/shop": shoppingList,
-    "/load": loadingScreen,
-    "/options": mealOptions,
-    "/select": mealSelect
+    "/list": mealList,//lists out all meals
+    "/view": mealView,//allows a meal to be edited
+    "/edit": mealEdit,//allows a meal to be edited
+    "/plan": mealPlan,//provides options to make a shopping list
+    "/shop": shoppingList,//displays the shopping list
+    "/load": loadingScreen,//shows a loading screen
+    "/options": mealOptions,//shows options for how the user can add a meal
+    "/select": mealSelect//shows a list of recipes the user can select
   })
 }
