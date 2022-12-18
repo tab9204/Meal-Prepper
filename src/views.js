@@ -3,7 +3,6 @@ import {database} from './database.js';
 import {navigate,views,utilities} from './data.js'
 import {
   loadingImg,
-  pullToReload,
   trashCan,
   checkIcon,
   navigateIcon,

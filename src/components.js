@@ -69,23 +69,6 @@ var navBar = {
   }
 }
 
-//off screen loading icon that can be pulled into view to reload or do some other action
-var pullToReload ={
-  oncreate: (vnode)=>{
-    var element = document.querySelector(vnode.attrs.touch);
-    var start = views.mealSelect.overscroll.start;
-    var bottom = views.mealSelect.overscroll.bottom;
-    var end = views.mealSelect.overscroll.end;
-    //init the overscroll functionality
-    utilities.initOverscroll(element,start,null,bottom,end);
-  },
-  view: (vnode)=>{
-    return m(".reload",[
-      m("img",{src:"./assets/loading.gif"})
-    ])
-  }
-}
-
 var popupMenu = {
   view: (vnode)=>{
     return m("#popupMenu.invisible", vnode.attrs,[vnode.children])
@@ -205,7 +188,6 @@ var cancelIcon = {
 export{
   loadingImg,
   navBar,
-  pullToReload,
   trashCan,
   checkIcon,
   navigateIcon,

@@ -1,10 +1,7 @@
-var cacheName = 'offlineCache-v11';
+var cacheName = 'offlineCache-v13';
 
 var contentToCache = [
   './manifest.json',
-  './assets/plus.png',
-  './assets/home.png',
-  './assets/plan.png',
   './assets/chicken_512.png',
   './assets/chicken_192.png',
   './assets/WorkSans-VariableFont_wght.ttf',
@@ -23,7 +20,6 @@ self.addEventListener('install', (event) => {
   );
 });
 
-/*
 
 self.addEventListener('activate', function(event) {
   event.waitUntil(
@@ -43,4 +39,4 @@ self.addEventListener('fetch', function(event) {
       return fetch(event.request) || response;
     })
   );
-});*/
+});
