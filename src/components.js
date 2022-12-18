@@ -1,12 +1,18 @@
 /*****view components****/
 import {navigate,utilities} from './data.js'
 import {views} from './data.js'
+import {database} from './database.js';
 
 //loading gif
 var loadingImg = {
   view: (vnode)=>{
     return m("#loadingImg",[
-      m("img",{src:"./assets/loading.gif"})
+      m("#loading",[
+        m(".rotate"),
+        m(".rotate"),
+        m(".rotate"),
+        m(".rotate")
+      ])
     ])
   }
 }
@@ -22,8 +28,16 @@ var navBar = {
           onclick: async (e)=>{
             //add the pulse animation
             navigate.addPulse(e);
-            //navigate to the shopping list view
-            await navigate.toShoppingList();
+            //check if there is a saved meal plan
+            var mealPlan = await database.getAll(database.mealPlan);
+            //if the meal plan is empty route the user to the meal plan view
+            if(mealPlan.length <= 0){
+              await navigate.toMealPlan();
+            }
+            //otherwise take the user to the shopping list view
+            else{
+              await navigate.toShoppingList();
+            }
           }
         })
       ]),

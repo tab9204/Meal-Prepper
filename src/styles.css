@@ -125,6 +125,7 @@ mealPlan #pageContent{overflow-y: visible !important; padding: 0px !important;}
       mealPlan #select .checkBtn.checked{color: black; background: var(--blue);;}
       mealPlan #select .checkBtn.checked .plusIcon{opacity: 0;}
       mealPlan #select .checkBtn .plusIcon{width: 20px; height: 20px; margin-left: 7px;}
+      mealPlan .snapBackTop .checkBtn, mealPlan .snapBackBottom .checkBtn{margin: 15px 0px !important; transition: margin .5s;}
 
 shoppingList .menu {background: var(--grey);; border-radius: 36px;}
 shoppingList #shoppingList{margin: 0px auto;}
@@ -143,6 +144,11 @@ loadingScreen #loadingImg{z-index: 2; background: var(--white); position: absolu
 loadingScreen #toMealPlan{pointer-events: none !important;}
 loadingScreen #toMealList{pointer-events: none !important;}
 loadingScreen #toMealView{pointer-events: none !important;}
+loadingScreen #loading{width: 200px; height: 200px;}
+loadingScreen #loading div{ position: absolute; width: 200px; height: 200px; border: 5px solid; border-radius: 200px; border-color: var(--blue) transparent transparent transparent;}
+loadingScreen #loading div:nth-child(2){ animation-delay: 0.1s;}
+loadingScreen #loading div:nth-child(3){ animation-delay: 0.2s;}
+loadingScreen #loading div:nth-child(4){ animation-delay: 0.3s;}
 
 /*Animations*/
 .navInLeft{animation: navInLeft 0.2s; animation-fill-mode: forwards;}
@@ -212,6 +218,23 @@ loadingScreen #toMealView{pointer-events: none !important;}
 @keyframes snapBackBottom {
   50% {top: 5px;}
   100% {top: 0px;}
+}
+
+.rotate{
+  animation: rotate 2.0s;
+  animation-iteration-count: infinite;
+}
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  80% {
+    transform: rotate(360deg);
+  }
+  100%{
+    transform: rotate(360deg);
+  }
+
 }
 
 

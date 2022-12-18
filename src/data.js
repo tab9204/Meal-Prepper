@@ -32,15 +32,7 @@ var navigate = {
   //navigates to the shopping list view
   toShoppingList: async ()=>{
     await views.shoppingList.initalize();
-    //if the shopping list is empty
-    if(views.shoppingList.list.length <= 0){
-      //reroute to the meal plan view
-      await navigate.toMealPlan();
-    }
-    else{
-      //route to the shopping list view
-      m.route.set('/shop');
-    }
+    m.route.set('/shop');
   },
   //navigates to the loading screen view
   //load => string that specifies what what steps to take during loading and what page to route to after the loading is complete
@@ -56,7 +48,7 @@ var navigate = {
     //route to the meal select screen view
     m.route.set('/select');
   },
-  //adds a pulse animation to a navigation button on click
+  //adds a pulse animation to a navigation bar button on click
   //e => element that triggered the click event
   addPulse: (e)=>{
     //create the background pulse element
@@ -512,6 +504,13 @@ var views = {
           element.style.overflowY = "hidden";
           //move the element by the drag amount
           element.style.top = (views.mealList.overscroll.drag) +"px";
+
+          var buttons = document.querySelectorAll(".checkBtn");
+          buttons.forEach((button) => {
+            var style = button.currentStyle || window.getComputedStyle(button);
+            button.style.margin = (parseInt(style.margin) + (views.mealList.overscroll.drag / 2)) + "px 0px";
+          });
+
           //increment the drag
           views.mealList.overscroll.drag++;
         }
@@ -519,9 +518,14 @@ var views = {
       bottom: ()=>{
         var element = document.querySelector(".pageSection:not(.hidden) .planList")
         if(views.mealList.overscroll.drag >= -5){
+
           element.style.overflowY = "hidden";
+
           element.style.top = (views.mealList.overscroll.drag) +"px";
+
           views.mealList.overscroll.drag--;
+
+          console.log(views.mealList.overscroll.drag)
         }
       },
       end: ()=>{
@@ -540,6 +544,11 @@ var views = {
           element.classList.add("snapBackBottom");
           views.mealList.overscroll.drag = 0;
         }
+
+        var buttons = document.querySelectorAll(".checkBtn");
+        buttons.forEach((button) => {
+          button.removeAttribute("style");
+        });
       }
     }
   },
@@ -551,12 +560,10 @@ var views = {
       var shoppingList = [];
       //get the meals in the meal plan
       var mealPlan = await database.getAll(database.mealPlan);
-      //if the meal plan is empty exit the function
-      if(mealPlan.length <= 0){return;}
       //loop through the meal plan
-      for (var day of mealPlan){
-        //get the meal data for the meal of the day
-        var meal = await database.get(database.meals,day.doc.meal_id);
+      for (var meal of mealPlan){
+        //get the meal data for the meal
+        var meal = await database.get(database.meals,meal.doc.meal_id);
         //if the meal is not in the db skip it
         if(meal == ""){continue;}
         //if the meals checked array is undefined set it to an empty array
@@ -605,6 +612,7 @@ var views = {
       var update = {name: meal.name, ingredients:meal.ingredients, directions:meal.directions, checked: meal.checked};
       await database.update(database.meals,meal._id,update);
     },
+    //popup menu button functions
     popup: {
       meal_id: null, //the id of the meal that should be deleted if the user selects delete
       delete: async ()=>{
@@ -631,30 +639,6 @@ const utilities ={
       var temp = array[i];
       array[i] = array[j];
       array[j] = temp;
-    }
-  },
-  //functions to open and close an on screen lightbox
-  lightBox:{
-    //id => element id of the lightbox to open
-    open: (id)=>{
-      try {
-        //only open the lightbox if one is not already open
-        if(!document.getElementsByClassName("lightBoxContainer open").length >= 1){
-          var lightBox = document.getElementById(id);
-          lightBox.classList.remove("closed");
-          lightBox.classList.add("open");
-        }
-      }
-      catch(e){console.log("No lightbox on this view");}
-    },
-    //id => element id of the lightbox to close
-    close: (id)=>{
-      try{
-        var lightBox = document.getElementById(id);
-        lightBox.classList.remove("open");
-        lightBox.classList.add("closed");
-      }
-      catch(e){console.log("No lightbox on this view");}
     }
   },
   //functions to open and close the popup menu

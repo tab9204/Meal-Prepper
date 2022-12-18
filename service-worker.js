@@ -1,9 +1,7 @@
-var cacheName = 'offlineCache-v10';
-
+var cacheName = 'offlineCache-v11';
 
 var contentToCache = [
   './manifest.json',
-  './assets/loading.gif',
   './assets/plus.png',
   './assets/home.png',
   './assets/plan.png',
@@ -25,6 +23,8 @@ self.addEventListener('install', (event) => {
   );
 });
 
+/*
+
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then((keyList) => {
@@ -43,4 +43,4 @@ self.addEventListener('fetch', function(event) {
       return fetch(event.request) || response;
     })
   );
-});
+});*/

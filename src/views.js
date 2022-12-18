@@ -237,10 +237,7 @@ var mealSelect = {
             ])
           ])
         })
-      ]),
-      m(pullToReload,{
-        touch: "#pageContent"
-      })
+      ])
     ])
   }
 }
@@ -382,7 +379,7 @@ var loadingScreen = {
           utilities.navBar.enable();
           //navigate back to the meal plan
           await navigate.toMealPlan();
-        }, 2000);
+        }, 2500);
       }
       //recipe load steps
       else if(vnode.attrs.load == "recipe"){
@@ -394,14 +391,14 @@ var loadingScreen = {
         setTimeout(async() => {
           utilities.navBar.enable();
           await navigate.toMealSelect();
-        }, 2000);
+        }, 2500);
       }
       else if(vnode.attrs.load == "shopping"){
         //wait at least 2 seconds and then navigate
         setTimeout(async() => {
           utilities.navBar.enable();
           await navigate.toShoppingList();
-        }, 2000);
+        }, 2500);
       }
     }
     catch(e){
