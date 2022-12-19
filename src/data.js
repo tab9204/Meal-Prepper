@@ -122,64 +122,6 @@ var views = {
       m.redraw();
     },
     //variables and functions for oversrolling the meal list
-    overscroll: {
-      drag: 0,
-      start: ()=>{
-        //get the scrolling page element
-        var element = document.querySelector("#pageContent");
-        //reset the element to the default position
-        element.style.top = "0px";
-        //set the overflowY to scroll if not already
-        element.style.overflowY = "scroll";
-        //remove the snap back animation classes
-        element.classList.remove("snapBackTop");
-        element.classList.remove("snapBackBottom");
-        //reset the drag variable
-        views.mealList.overscroll.drag = 0;
-      },
-      top: ()=>{
-
-        var element = document.querySelector("#pageContent");
-        //if the element has been dragged less then 10 px
-        if(views.mealList.overscroll.drag <= 5){
-          //lock the scrolling
-          element.style.overflowY = "hidden";
-          //move the element by the drag amount
-          element.style.top = (views.mealList.overscroll.drag) +"px";
-          //increment the drag
-          views.mealList.overscroll.drag++;
-        }
-        //cancel the delete hold
-        views.mealList.cancelHold();
-      },
-      bottom: ()=>{
-        var element = document.querySelector("#pageContent");
-        if(views.mealList.overscroll.drag >= -5){
-          element.style.overflowY = "hidden";
-          element.style.top = (views.mealList.overscroll.drag) +"px";
-          views.mealList.overscroll.drag--;
-        }
-        //cancel the delete hold
-        views.mealList.cancelHold();
-      },
-      end: ()=>{
-        var element = document.querySelector("#pageContent");
-        //unlock the elements overflowY scroll
-        element.style.overflowY = "scroll";
-        //if the element has been dragged down
-        if(parseInt(element.style.top) >= 1){
-          //snap the element back to the top and reset the drag
-          element.classList.add("snapBackTop");
-          views.mealList.overscroll.drag = 0;
-        }
-        //if the element was dragged up
-        else if(parseInt(element.style.top) <= -1){
-          //snap the element back to the bottom and reset the drag
-          element.classList.add("snapBackBottom");
-          views.mealList.overscroll.drag = 0;
-        }
-      }
-    },
     //timeout function for the go btn hold gesture
     holdTimeout: null,
     touchX:null,
@@ -480,77 +422,6 @@ var views = {
         document.querySelector(".menu").classList.add("hidden");
       }
     },
-    //variables and functions for oversrolling the meal list
-    overscroll: {
-      drag: 0,
-      start: ()=>{
-        //get the scrolling page element
-        var element = document.querySelector(".pageSection:not(.hidden) .planList")
-        //reset the element to the default position
-        element.style.top = "0px";
-        //set the overflowY to scroll if not already
-        element.style.overflowY = "scroll";
-        //remove the snap back animation classes
-        element.classList.remove("snapBackTop");
-        element.classList.remove("snapBackBottom");
-        //reset the drag variable
-        views.mealList.overscroll.drag = 0;
-      },
-      top: ()=>{
-        var element = document.querySelector(".pageSection:not(.hidden) .planList")
-        //if the element has been dragged less then 10 px
-        if(views.mealList.overscroll.drag <= 5){
-          //lock the scrolling
-          element.style.overflowY = "hidden";
-          //move the element by the drag amount
-          element.style.top = (views.mealList.overscroll.drag) +"px";
-
-          var buttons = document.querySelectorAll(".checkBtn");
-          buttons.forEach((button) => {
-            var style = button.currentStyle || window.getComputedStyle(button);
-            button.style.margin = (parseInt(style.margin) + (views.mealList.overscroll.drag / 2)) + "px 0px";
-          });
-
-          //increment the drag
-          views.mealList.overscroll.drag++;
-        }
-      },
-      bottom: ()=>{
-        var element = document.querySelector(".pageSection:not(.hidden) .planList")
-        if(views.mealList.overscroll.drag >= -5){
-
-          element.style.overflowY = "hidden";
-
-          element.style.top = (views.mealList.overscroll.drag) +"px";
-
-          views.mealList.overscroll.drag--;
-
-          console.log(views.mealList.overscroll.drag)
-        }
-      },
-      end: ()=>{
-        var element = document.querySelector(".pageSection:not(.hidden) .planList")
-        //unlock the elements overflowY scroll
-        element.style.overflowY = "scroll";
-        //if the element has been dragged down
-        if(parseInt(element.style.top) >= 1){
-          //snap the element back to the top and reset the drag
-          element.classList.add("snapBackTop");
-          views.mealList.overscroll.drag = 0;
-        }
-        //if the element was dragged up
-        else if(parseInt(element.style.top) <= -1){
-          //snap the element back to the bottom and reset the drag
-          element.classList.add("snapBackBottom");
-          views.mealList.overscroll.drag = 0;
-        }
-
-        var buttons = document.querySelectorAll(".checkBtn");
-        buttons.forEach((button) => {
-          button.removeAttribute("style");
-        });
-      }
-    }
   },
   shoppingList:{
     //shopping list render data
@@ -680,28 +551,32 @@ const utilities ={
     //wait 300 ms to allow time for the nav animation to finish
     return new Promise((resolve) => {setTimeout(() => {resolve()}, time)});
   },
-  //initalizes over scroll functionality on a specified element
-  //determines what should happen when a scrollable element reaches the end of its scroll and the user continues to scroll
+  //initalizes overscroll functionality on a specified element
   //element => the scrollable element to attach the event listners on
-  //start => function to run when user touch starts
-  //top => function to run when the user is scrolling at the top of the page
-  //bottom => function to run when the user is scrolling at the bottom of the page
-  //end => function to run when the user touch ends
-  initOverscroll: (element,start,top,bottom,end)=>{
+  overScroll: (element)=>{
     //the Y postion of the user's finger when dragging starts
    var dragStartY;
    //The starting Y position of the user's finger when the element reaches the end of its scroll
    var endScrollY = 0;
    //how many px the user has swiped down since reaching the end of its scroll
    var deltaY = 0;
+   //how many px the element has been dragged
+   var drag = 0;
    //add the touch start, touch move, and touch end event listeners to the touch element
    element.addEventListener('touchstart', (e)=>{
       //set the dragStartY
       dragStartY = e.touches[0].pageY;
-      //run the start function
-      if(start !== null){
-        start(deltaY);
-      }
+      //reset the element to the default position
+      element.style.top = "0px";
+      //set the overflowY to scroll if not already
+      element.style.overflowY = "scroll";
+      //remove the snap back animation classes
+      element.classList.remove("snapBackTop");
+      element.classList.remove("snapBackBottom");
+      element.classList.remove("scrollAtTop");
+      element.classList.remove("scrollAtBottom");
+      //reset the drag variable
+      drag = 0;
     }, {passive: true});
 
     element.addEventListener('touchmove', (e) => {
@@ -709,25 +584,38 @@ const utilities ={
       var y = e.touches[0].pageY;
       //if the user is at the top of the element scroll and is swiping down
       if (element.scrollTop == 0 && y > dragStartY) {
+        //set the at top class
+        element.classList.add("scrollAtTop");
         //set the endScrollY if it has not already been set
         if(endScrollY == 0){endScrollY = y;}
         //calculate the deltaY
         deltaY = y - endScrollY;
-        //pass the deltaY to the top function and run it
-        if(top !== null){
-          top(deltaY);
+        //if the element has been dragged less then 5 px
+        if(drag <= 5){
+          //lock the scrolling
+          element.style.overflowY = "hidden";
+          //move the element by the drag amount
+          element.style.top = (drag) +"px";
+          //increment the drag
+          drag++;
         }
+
       }
       //if the user is at the bottom of the element scroll and is swiping up
       else if(Math.ceil(element.offsetHeight + element.scrollTop) >= element.scrollHeight && y < dragStartY){
+        //set the at bottom class
+        element.classList.add("scrollAtBottom");
         //set the endScrollY if it has not already been set
         if(endScrollY == 0){endScrollY = y;}
         //calculate the deltaY
         deltaY = y - endScrollY;
-        //pass the deltaY to the bottom function and run it
-        if(bottom !== null){
-          bottom(deltaY);
+        //if the element has been dragged less then 5 px
+        if(drag >= -5){
+          element.style.overflowY = "hidden";
+          element.style.top = (drag) +"px";
+          drag--;
         }
+
       }
       //if the scroll is neither at the top or bottom or the page
       else if(element.scrollTop != 0 || Math.ceil(element.offsetHeight + element.scrollTop) <= element.scrollHeight){
@@ -739,10 +627,23 @@ const utilities ={
     element.addEventListener('touchend', (e) => {
       //reset the endScrollY to 0
       endScrollY = 0;
-      //run the end function
-      if(end !== null){
-        end(deltaY);
+      //unlock the elements overflowY scroll
+      element.style.overflowY = "scroll";
+      //if the element has been dragged down
+      if(parseInt(element.style.top) >= 1){
+        //snap the element back to the top and reset the drag
+        element.classList.add("snapBackTop");
+        drag = 0;
       }
+      //if the element was dragged up
+      else if(parseInt(element.style.top) <= -1){
+        //snap the element back to the bottom and reset the drag
+        element.classList.add("snapBackBottom");
+        drag = 0;
+      }
+      element.classList.remove("scrollAtTop");
+      element.classList.remove("scrollAtBottom");
+
     },{passive: true});
   }
 }

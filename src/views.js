@@ -23,12 +23,8 @@ var mealList = {
   oncreate: ()=>{
     //get the elements on the page that will be used for the overscroll
     var element = document.querySelector("#pageContent");
-    var start = views.mealList.overscroll.start;
-    var top = views.mealList.overscroll.top;
-    var bottom = views.mealList.overscroll.bottom;
-    var end = views.mealList.overscroll.end;
     //init the overscroll functionality
-    utilities.initOverscroll(element,start,top,bottom,end);
+    utilities.overScroll(element);
   },
   view: (vnode)=>{
     return m("mealList#pageContainer",[
@@ -38,7 +34,8 @@ var mealList = {
       ]),
       m("#pageContent",{
         ontouchstart:()=>{utilities.popup.close()},//when the user clicks here the popup should close
-        onscroll: (e)=> {views.mealList.cancelHold(e);}//when the view scrolls cancel the delete hold timer
+        onscroll: (e)=> {views.mealList.cancelHold(e);},//when the view scrolls cancel the delete hold timer
+        ontouchmove: (e)=>{views.mealList.cancelHold(e);}
       },[
         m(".pageSection", views.mealList.allMeals.length >= 1 ? [//if there is at least 1 meal already saved
           m("#recipeList",[
@@ -248,12 +245,8 @@ var mealPlan = {
     if(views.mealPlan.savedMeals.length >= 1){
       //get the elements to set up the overscroll
       var selectElement = document.querySelector("#selectList");
-      var start = views.mealPlan.overscroll.start;
-      var top = views.mealPlan.overscroll.top;
-      var bottom = views.mealPlan.overscroll.bottom;
-      var end = views.mealPlan.overscroll.end;
       //init the overscroll functionality
-      utilities.initOverscroll(selectElement,start,top,bottom,end);
+      utilities.overScroll(selectElement);
     }
   },
   view: (vnode)=>{
