@@ -2,6 +2,7 @@ require('dotenv').config({ path: 'keys.env' });
 const express = require('express');
 const app = express();
 const http = require('http');
+const url = require('url');
 const server = http.createServer(app);
 const fs = require('fs');
 const { Client } = require('pg');
@@ -9,9 +10,17 @@ const axios = require('axios');
 const compression = require('compression');
 const { MongoClient } = require("mongodb");
 
+const fixieUrl = url.parse(process.env.FIXIE_URL);
+const fixieAuth = fixieUrl.auth.split(':');
+
 
 const uri = process.env.MONGODB_URI;
-const client = new MongoClient(uri);//server client
+const client = new MongoClient(uri, {
+    proxyUsername: fixieAuth[0],
+    proxyPassword: fixieAuth[1],
+    proxyHost: fixieUrl.hostname,
+    proxyPort: fixieUrl.port
+});
 const db = client.db("meals");//database
 const col = db.collection("meal_data");//collection
 
