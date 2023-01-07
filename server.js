@@ -7,24 +7,15 @@ const fs = require('fs');
 const { Client } = require('pg');
 const axios = require('axios');
 const compression = require('compression');
+const { MongoClient } = require("mongodb");
 
 
-/*
-//database client
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+const uri = process.env.MONGODB_URI;
+const client = new MongoClient(uri);//server client
+const db = client.db("meals");//database
+const col = db.collection("meal_data");//collection
 
-client.connect();
 
-//push notification keys
-const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
-const privateVapidKey = process.env.PRIVATE_VAPID_KEY;*/
-
-//webPush.setVapidDetails('mailto:nimdhiran@gmail.com', publicVapidKey, privateVapidKey);
 
 server.listen(process.env.PORT || 3000, () => {
   console.log('Server started');
@@ -67,7 +58,7 @@ app.get('/getRecipes', async (req,res) => {
   try{
      const response = await axios.get("https://api.spoonacular.com/recipes/complexSearch", {params:
        {
-         apiKey:"cdf510754c3541e8a42f14b7384540d1",
+         apiKey: process.env.SPOONACULAR_KEY,
          instructionsRequired:true,
          fillIngredients:true,
          addRecipeInformation:true,
@@ -82,5 +73,68 @@ app.get('/getRecipes', async (req,res) => {
   catch (error){
     console.log(error);
     res.status("500").send({message: 'Failed to retrieve recipes'});
+  }
+});
+
+//adds a new recovery entry to the db
+app.post('/newRecovery', async (req,res) => {
+  try{
+    //insert the new recovery entry into the db
+    var recovery_doc = {
+      "recovery_id":req.body.recovery_id,
+      "meals":req.body.meals
+    }
+    //connect to the db server
+    await client.connect();
+    //insert the new entry
+    await col.insertOne(recovery_doc);
+    res.send("New recovery entry added");
+  }
+  catch (error){
+    console.log(error);
+    res.status(500).send({message: 'DB operation failed'});
+  }
+});
+
+//updates an existing recovery entry in the db
+app.post('/updateRecovery', async (req,res) => {
+  try{
+    //connect to the db server
+    await client.connect();
+    //insert the new entry
+    await col.updateOne(
+      {"recovery_id":req.body.recovery_id},
+      {$set: { 'meals': req.body.meals}}
+    );
+    res.send("Recovery entry updated");
+  }
+  catch (error){
+    console.log(error);
+    res.status(500).send({message: 'DB operation failed'});
+  }
+});
+
+//recovers a user's data given a recovery id
+app.post('/recoverData', async (req,res) => {
+  try{
+    //insert the new recovery entry into the db
+    var recovery_doc = {
+      "recovery_id":req.body.recovery_id,
+      "meals":req.body.meals
+    }
+    //connect to the db server
+    await client.connect();
+    //insert the new entry
+    var data = await col.findOne({"recovery_id":req.body.recovery_id});
+    if(data == null){
+      res.send([]);
+    }
+    else{
+      res.send(data.meals);
+    }
+  }
+  catch (error){
+    console.log(error);
+    res.status(500).send({message: 'DB operation failed'});
   }
 });

@@ -10,7 +10,7 @@ var database = {
     //directions => string that contains all directions for the meal
     //checked => array containing ingredients that have been checked off on the shopping list
   meals: new PouchDB('meals'),
-  //stores a list of days that make up a meal plan
+  //stores a list of meals that make up a meal plan
   //each entry is a day in the meal plan that contains:
     //meal_id => id of the meal on that day of the meal plan
     //checked => a boolean for if the day was checked off or not

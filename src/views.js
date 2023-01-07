@@ -306,7 +306,6 @@ var mealOptions = {
   }
 }
 
-
 //generates and displays a shopping list of ingredients needed for the meal plan
 var shoppingList = {
   view: (vnode)=>{
@@ -392,6 +391,25 @@ var loadingScreen = {
           await navigate.toShoppingList();
         }, 2500);
       }
+      //load to show after a new recovery id has been saved by the user
+      else if(vnode.attrs.load == "new_recovery"){
+        setTimeout(async() => {
+          var id = vnode.attrs.recovery_id;
+          await views.recovery.new_recovery(id);
+          utilities.navBar.enable();
+          //route back to the recovery screen and show the second step
+          m.route.set('/recovery');
+        }, 2500);
+      }
+      else if(vnode.attrs.load == "data_recovery"){
+        setTimeout(async() => {
+          //use the provided recovery id to recovery any data on the db
+          await views.recovery.data_recovery(vnode.attrs.recovery_id);
+          utilities.navBar.enable();
+          //navigate to the meal list screen
+          await navigate.toMealList();
+        }, 2500);
+      }
     }
     catch(e){
       //if there was an error while loading route the user back the the list view
@@ -409,5 +427,83 @@ var loadingScreen = {
   }
 }
 
+var recoverData = {
+  oncreate: async (vnode)=>{
+    var id = await views.recovery.get_local_id();
+    //if no recovery id has been set then start at step 1
+    //step 1 allows the user to specify an id to use for recovery
+    if(id == null){
+      document.querySelector("#step1").classList.remove("hidden");
+    }
+    //otherwise we already have an id set and we want to show step 3
+    //step 3 allows the user to insert their saved id to recover their id
+    else{
+      document.querySelector("#step2").classList.remove("hidden");
+    }
+  },
+  view: (vnode)=>{
+    return m("recoverData#pageContainer",[
+      m("#pageContent",[
+        m("#step1.pageSection.hidden",[
+          m("div","Input a unique ID to use as a recovery password."),
+          m("div","This will allow you to recover your recipes if they are wiped or you get a new phone."),
+          m("div","If you have already created an ID skip this step and proceed with the recovery process."),
+          m("input#idInput",{placeholder: "Recovery Id here", type: "text"}),
+          m("div",[
+            m(".checkBtn",{onclick:()=>{
+              //get the text in the input field
+              var text = document.querySelector("#idInput");
+              var date = Date.now().toString();
+              //combine the text with the last 4 digits of a timestamp so that we create a unique recovery code
+              var id = text.value + date.substring(date.length - 4);
+              //sanatize the input and only allow alphanumeric characters
+              if(!id.match(/^[0-9a-z]+$/)){
+                alert("ID must only contain alphanumeric characters");
+                return;
+              }
+              //check that the input field is not empty
+              if(id == ""){
+                alert("Id field cannot be empty");
+                return;
+              }
+              //route to the load screen so that the id can be added to the local and server db
+              m.route.set('/load',{load:"new_recovery",recovery_id:id});
+            }},"Create Recovery Id"),
+            m(".checkBtn",{onclick:()=>{
+              document.querySelector("#step1").classList.add("hidden");
+              document.querySelector("#step2").classList.remove("hidden");
+            }},"Skip to recovery step")
+          ])
+        ]),
+        m("#step2.pageSection.hidden",[
+          m("div",{class: views.recovery.id == null ? "hidden" : ""},[
+            m(".idText", views.recovery.id),
+            m("div","Here is your recipe recovery ID. Save this and use it to recover your recipes")
+          ]),
+          m("div","Insert your id here to recover your lost recipes"),
+          m("input#recoveryInput",{placeholder: "Recovery Id here", type: "text"}),
+          m(".checkBtn",{onclick:()=>{
+            //get the text in the input field
+            var text = document.querySelector("#recoveryInput");
+            var id = text.value;
+            //sanatize the input and only allow alphanumeric characters
+            if(!id.match(/^[0-9a-z]+$/)){
+              alert("ID must only contain alphanumeric characters");
+              return;
+            }
+            //check that the input field is not empty
+            if(id == ""){
+              alert("Id field cannot be empty");
+              return;
+            }
+            //route to the load screen
+            m.route.set('/load',{load:"data_recovery",recovery_id:id});
+          }},"Recover lost recipes")
+        ])
+      ])
+    ])
+  }
+}
 
-export{mealList,mealView,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect};
+
+export{mealList,mealView,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect,recoverData};

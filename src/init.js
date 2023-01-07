@@ -1,9 +1,11 @@
 //********Initalization script that starts the app*****//
 //import views and the mithril library
-import {mealList,mealView,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect} from './views.js';
-import {navigate} from './data.js'
+import {mealList,mealView,mealEdit,mealPlan,shoppingList,loadingScreen,mealOptions,mealSelect,recoverData} from './views.js';
+import {navigate,views} from './data.js'
 import {navBar} from './components.js'
+import {database} from './database.js';
 import "../libraries/mithril.min.js";
+
 
 window.onload = async () =>{
   //register service worker
@@ -16,6 +18,9 @@ window.onload = async () =>{
   else{
     console.log("Service Workers not supported");
   }
+  //app init recovery entry update
+  //this can happen in the background so no need to await
+  views.recovery.update_recovery();
   //get the nav root container
   var navRoot = document.getElementById("navRoot");
   //render the navBar to the nav root container
@@ -24,6 +29,7 @@ window.onload = async () =>{
   await navigate.toMealList();
   //get the page root container
   var pageRoot = document.getElementById("pageRoot");
+
   //set up the app routes
   m.route(pageRoot, "/list",{
     "/list": mealList,//lists out all meals
@@ -33,6 +39,7 @@ window.onload = async () =>{
     "/shop": shoppingList,//displays the shopping list
     "/load": loadingScreen,//shows a loading screen
     "/options": mealOptions,//shows options for how the user can add a meal
-    "/select": mealSelect//shows a list of recipes the user can select
+    "/select": mealSelect,//shows a list of recipes the user can select
+    "/recovery":recoverData//allows the user to input a recovery id and recover lost data
   })
 }

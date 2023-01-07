@@ -86,6 +86,8 @@ var views = {
       },
       edit: async ()=>{
         await navigate.toMealEdit(views.mealList.popup.meal_id);
+        //update the recovery entry in the server db
+        views.recovery.update_recovery();
       }
     },
     allMeals: [],//array containg the meal data needed to render the view
@@ -253,6 +255,8 @@ var views = {
         //otherwise the meal doesnt exit and we should add it to the db
         else if (meal == ""){
           await database.add(database.meals,id,data);
+          //update the recovery entry in the server db
+          views.recovery.update_recovery();
         }
       }, 500);
     }
@@ -496,6 +500,107 @@ var views = {
       },
       cancel: async ()=>{
         utilities.popup.close();
+      }
+    }
+  },
+  recovery:{
+    id:null,
+    //checks the local meals db for a stored recovery id, returns null if not found
+    get_local_id: async ()=>{
+      //see if there is a recovery id already set
+      try{
+          //check the meals db local documents
+          var result = await database.meals.get("_local/recovery_id");
+          return result.recovery_id;
+        }
+        catch(error){
+          return null;
+        }
+    },
+    //adds a new recovery entry to the server db
+    new_recovery: async (id)=>{
+      //get all meal data from the local db
+      var meals = await database.getAll(database.meals);
+      //convert the meals to a string
+      var meals_string = JSON.stringify(meals);
+      //the data we are sending to the server
+      var data = {recovery_id: id, meals: meals_string}
+      //request a new recovery entry be added to the server db
+      try{
+        var response = await fetch("/newRecovery", {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json'
+         },
+         body:JSON.stringify(data)
+       });
+        if(!response.ok){var error = await response.json(); throw error.message;}
+        //if there were no errors we can update the local db with the new recovery id
+        await database.meals.put({"_id": "_local/recovery_id", "recovery_id": id});
+        views.recovery.id = id;
+      }
+      catch (error){
+       throw error;
+      }
+    },
+    //updates the meal data of an existing recovery entry
+    //updates occur when the app is first booted, when a new meal is added, and when a meal is deleted
+    update_recovery: async ()=>{
+      var id = await views.recovery.get_local_id();
+      views.recovery.id = id;
+      //exit out if no recovery id has been set
+      if(id == null){
+        return;
+      }
+      //get all meal data from the local db
+      var meals = await database.getAll(database.meals);
+      //convert the meals to a string
+      var meals_string = JSON.stringify(meals);
+      //the data we are sending to the server
+      var data = {recovery_id: id, meals: meals_string};
+      //request a new recovery entry be added to the server db
+      try{
+        var response = await fetch("/updateRecovery", {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json'
+         },
+         body:JSON.stringify(data)
+       });
+        if(!response.ok){var error = await response.json(); throw error.message;}
+      }
+      catch (error){
+       throw error;
+      }
+    },
+    data_recovery: async (id)=>{
+      var data = {recovery_id: id};
+      try{
+        var response = await fetch("/recoverData", {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json'
+         },
+         body:JSON.stringify(data)
+       });
+        if(!response.ok){var error = await response.json(); throw error.message;}
+        //parse the data returned
+        var recoverd_data = await response.json();
+        //add each of the meals recovered to the local meals db
+        recoverd_data.forEach(async (meal,i) => {
+          var data = {name: meal.doc.name, ingredients: meal.doc.ingredients, directions: meal.doc.directions, checked: []};
+          try{
+            await database.add(database.meals,meal.id,data);
+          }
+          catch(e){
+            //if we get an error just continue trying to ad the meals
+            //the error is likely becuase the meal already exists in the db
+            console.log(e);
+          }
+        });
+      }
+      catch (error){
+       throw error;
       }
     }
   }
